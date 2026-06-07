@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>差旅报销管理系统 — 后端开发作品集</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root {
+    --primary: #2563eb;
+    --primary-light: #3b82f6;
+    --primary-dark: #1d4ed8;
+    --primary-bg: rgba(37, 99, 235, 0.06);
+    --accent: #0891b2;
+    --accent-light: #06b6d4;
+    --accent-bg: rgba(8, 145, 178, 0.06);
+    --emerald: #059669;
+    --emerald-bg: rgba(5, 150, 105, 0.06);
+    --amber: #d97706;
+    --amber-bg: rgba(217, 119, 6, 0.06);
+    --rose: #e11d48;
+    --bg: #F8FAFC;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F1F5F9;
+    --border: #E2E8F0;
+    --border-light: #F1F5F9;
+    --text: #1E293B;
+    --text-dim: #64748B;
+    --text-muted: #94A3B8;
+    --shadow: 0 2px 8px rgba(30, 41, 59, 0.06), 0 1px 3px rgba(30, 41, 59, 0.04);
+    --shadow-lg: 0 8px 24px rgba(30, 41, 59, 0.1), 0 2px 8px rgba(30, 41, 59, 0.06);
+    --gradient-1: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden;
+}
+
+/* MERMAID */
+.mermaid-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+}
+.mermaid { display: flex; justify-content: center; }
+.mermaid svg { max-width: 100%; height: auto; }
+
+/* NAVIGATION */
+.nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(20px); background: rgba(248, 250, 252, 0.85);
+    border-bottom: 1px solid transparent; transition: all 0.3s ease;
+}
+.nav.scrolled { padding: 0.6rem 2rem; background: rgba(248, 250, 252, 0.95); border-bottom-color: var(--border); box-shadow: var(--shadow); }
+.nav-logo { font-size: 1.25rem; font-weight: 700; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; position: relative; }
+.nav-links a:hover { color: var(--primary); }
+.nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: var(--gradient-1); transition: width 0.3s; }
+.nav-links a:hover::after { width: 100%; }
+
+/* HERO */
+.hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2rem; position: relative; overflow: hidden; }
+.hero::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(37, 99, 235, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(8, 145, 178, 0.05) 0%, transparent 50%);
+    animation: heroGlow 8s ease-in-out infinite alternate;
+}
+@keyframes heroGlow { 0% { transform: translate(0, 0); } 100% { transform: translate(-5%, 5%); } }
+.hero-content { position: relative; z-index: 1; max-width: 800px; }
+.hero-badge {
+    display: inline-block; padding: 0.5rem 1.5rem;
+    background: var(--primary-bg); border: 1px solid rgba(37, 99, 235, 0.15);
+    border-radius: 50px; color: var(--primary); font-size: 0.85rem; margin-bottom: 2rem;
+    animation: fadeInUp 0.8s ease;
+}
+.hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; animation: fadeInUp 0.8s ease 0.2s both; }
+.hero h1 .gradient-text { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero p { font-size: 1.25rem; color: var(--text-dim); margin-bottom: 3rem; animation: fadeInUp 0.8s ease 0.4s both; }
+.hero-stats { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; animation: fadeInUp 0.8s ease 0.6s both; }
+.stat-item { text-align: center; }
+.stat-number { font-size: 2.5rem; font-weight: 800; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+/* SECTIONS */
+.section { padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; }
+.section-header { text-align: center; margin-bottom: 4rem; }
+.section-tag {
+    display: inline-block; padding: 0.4rem 1rem;
+    background: var(--primary-bg); border: 1px solid rgba(37, 99, 235, 0.15);
+    border-radius: 50px; color: var(--primary); font-size: 0.8rem;
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem;
+}
+.section-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+.section-desc { color: var(--text-dim); max-width: 600px; margin: 0 auto; }
+
+/* TECH STACK */
+.tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+.tech-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem; transition: all 0.3s ease;
+    position: relative; overflow: hidden;
+}
+.tech-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gradient-1); transform: scaleX(0); transition: transform 0.3s ease; }
+.tech-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: var(--shadow-lg); }
+.tech-card:hover::before { transform: scaleX(1); }
+.tech-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem; }
+.tech-icon.blue { background: var(--primary-bg); color: var(--primary); }
+.tech-icon.cyan { background: var(--accent-bg); color: var(--accent); }
+.tech-icon.green { background: var(--emerald-bg); color: var(--emerald); }
+.tech-icon.amber { background: var(--amber-bg); color: var(--amber); }
+.tech-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+.tech-card p { color: var(--text-dim); font-size: 0.9rem; }
+
+/* ARCHITECTURE */
+.arch-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; overflow-x: auto; }
+.arch-diagram { font-family: 'Courier New', monospace; font-size: 0.8rem; line-height: 1.4; color: var(--text-dim); white-space: pre; min-width: 700px; }
+.arch-diagram .highlight { color: var(--primary); font-weight: bold; }
+.arch-diagram .accent { color: var(--accent); font-weight: bold; }
+.arch-diagram .success { color: var(--emerald); font-weight: bold; }
+
+/* FEATURES */
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
+.feature-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; transition: all 0.3s ease; }
+.feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+.feature-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+.feature-number { width: 40px; height: 40px; border-radius: 10px; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; color: #fff; }
+.feature-card h3 { font-size: 1.15rem; }
+.feature-card p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1.5rem; }
+.code-block {
+    background: #F8FAFC; border: 1px solid var(--border); border-radius: 10px;
+    padding: 1rem 1.25rem; font-family: 'Courier New', monospace;
+    font-size: 0.8rem; line-height: 1.5; overflow-x: auto; color: var(--text-dim);
+}
+.code-block .keyword { color: #7C3AED; }
+.code-block .string { color: #059669; }
+.code-block .comment { color: var(--text-muted); }
+.code-block .type { color: #0891b2; }
+.code-block .annotation { color: #d97706; }
+
+/* STATE MACHINE */
+.state-machine { display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 2rem; }
+.state-node { background: var(--bg-card); border: 2px solid var(--border); border-radius: 12px; padding: 1rem 1.5rem; text-align: center; min-width: 120px; transition: all 0.3s ease; }
+.state-node.active { border-color: var(--primary); box-shadow: 0 0 20px rgba(37, 99, 235, 0.15); }
+.state-node .state-name { font-weight: 600; font-size: 0.95rem; }
+.state-node .state-code { color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem; }
+.state-arrow { color: var(--primary); font-size: 1.5rem; animation: arrowPulse 2s ease-in-out infinite; }
+@keyframes arrowPulse { 0%, 100% { opacity: 0.5; transform: translateX(0); } 50% { opacity: 1; transform: translateX(5px); } }
+
+/* DATABASE */
+.db-tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+.db-table { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.3s ease; }
+.db-table:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.db-table-header { background: var(--primary-bg); padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.75rem; }
+.db-table-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.db-table-header h4 { font-size: 0.95rem; }
+.db-table-body { padding: 1rem 1.25rem; }
+.db-field { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; font-size: 0.85rem; border-bottom: 1px solid var(--border-light); }
+.db-field:last-child { border-bottom: none; }
+.db-field-name { color: var(--text); font-family: monospace; }
+.db-field-type { color: var(--text-muted); font-size: 0.75rem; }
+.db-field.special { background: rgba(37, 99, 235, 0.03); margin: 0 -1.25rem; padding: 0.4rem 1.25rem; }
+
+/* ACCORDION */
+.accordion { display: flex; flex-direction: column; gap: 1rem; }
+.accordion-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.3s ease; }
+.accordion-item.active { border-color: var(--primary); }
+.accordion-header { padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: background 0.3s; }
+.accordion-header:hover { background: var(--bg-card-hover); }
+.accordion-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--primary-bg); display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: 700; flex-shrink: 0; }
+.accordion-header h3 { font-size: 1rem; flex: 1; }
+.accordion-arrow { color: var(--text-muted); transition: transform 0.3s; font-size: 1.2rem; }
+.accordion-item.active .accordion-arrow { transform: rotate(180deg); }
+.accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.accordion-body-inner { padding: 0 1.5rem 1.5rem; }
+.accordion-body p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1rem; }
+.accordion-body .label { display: inline-block; padding: 0.2rem 0.6rem; background: var(--primary-bg); border-radius: 4px; color: var(--primary); font-size: 0.75rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+/* METRICS */
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+.metric-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.3s ease; }
+.metric-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+.metric-value { font-size: 2.5rem; font-weight: 800; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.metric-label { color: var(--text-dim); font-size: 0.85rem; margin-top: 0.5rem; }
+
+/* SUBSIDY TABLE */
+.subsidy-demo { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.subsidy-table { width: 100%; border-collapse: collapse; }
+.subsidy-table th { background: var(--primary-bg); padding: 1rem; text-align: left; font-size: 0.85rem; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+.subsidy-table td { padding: 1rem; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
+.subsidy-table tr:last-child td { border-bottom: none; }
+.subsidy-table tr:hover { background: rgba(37, 99, 235, 0.03); }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
+.badge-blue { background: var(--primary-bg); color: var(--primary); }
+.badge-cyan { background: var(--accent-bg); color: var(--accent); }
+.badge-green { background: var(--emerald-bg); color: var(--emerald); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); }
+
+/* FOOTER */
+.footer { padding: 3rem 2rem; text-align: center; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
+.footer-links { display: flex; justify-content: center; gap: 2rem; margin-bottom: 1.5rem; }
+.footer-links a { color: var(--text-dim); text-decoration: none; transition: color 0.3s; }
+.footer-links a:hover { color: var(--primary); }
+
+/* REVEAL */
+.reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-left { opacity: 0; transform: translateX(-40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal-left.visible { opacity: 1; transform: translateX(0); }
+.reveal-right { opacity: 0; transform: translateX(40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal-right.visible { opacity: 1; transform: translateX(0); }
+.stagger > * { opacity: 0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); transition-delay: calc(var(--i, 0) * 0.1s); }
+.stagger.visible > * { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hero-stats { gap: 1.5rem; }
+    .stat-number { font-size: 2rem; }
+    .section { padding: 4rem 1.5rem; }
+    .section-title { font-size: 2rem; }
+    .features-grid { grid-template-columns: 1fr; }
+    .state-machine { flex-direction: column; }
+    .state-arrow { transform: rotate(90deg); }
+}
+@media (max-width: 480px) {
+    .hero h1 { font-size: 2rem; }
+    .hero p { font-size: 1rem; }
+    .tech-grid { grid-template-columns: 1fr; }
+    .db-tables { grid-template-columns: 1fr; }
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+    <a href="./index.html" class="nav-logo" style="text-decoration:none;">← 返回作品集</a>
+    <ul class="nav-links">
+        <li><a href="https://github.com/lvyums/reim" target="_blank" style="color:var(--primary);font-weight:600;">GitHub</a></li>
+        <li><a href="#tech">技术栈</a></li>
+        <li><a href="#architecture">架构设计</a></li>
+        <li><a href="#features">技术亮点</a></li>
+        <li><a href="#database">数据库</a></li>
+        <li><a href="#challenges">挑战与方案</a></li>
+        <li><a href="#metrics">项目数据</a></li>
+    </ul>
+</nav>
+
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-badge">后端开发作品集 · Spring Boot 3.2</span>
+        <h1>差旅报销<span class="gradient-text">管理系统</span></h1>
+        <p>面向企业内部的差旅费用报销全流程管理平台，覆盖报销单创建、行程管理、补助计算、状态流转等核心业务</p>
+        <div class="hero-stats">
+            <div class="stat-item"><div class="stat-number" data-count="10">0</div><div class="stat-label">业务数据表</div></div>
+            <div class="stat-item"><div class="stat-number" data-count="11">0</div><div class="stat-label">API接口</div></div>
+            <div class="stat-item"><div class="stat-number" data-count="3000">0</div><div class="stat-label">代码行数</div></div>
+            <div class="stat-item"><div class="stat-number" data-count="7">0</div><div class="stat-label">技术亮点</div></div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="tech">
+    <div class="section-header reveal">
+        <span class="section-tag">Tech Stack</span>
+        <h2 class="section-title">技术栈</h2>
+        <p class="section-desc">采用主流企业级技术栈，确保系统稳定性和可维护性</p>
+    </div>
+    <div class="tech-grid stagger">
+        <div class="tech-card" style="--i:0"><div class="tech-icon blue">☕</div><h3>Java 17</h3><p>使用 switch 表达式、var 关键字等新特性，提升代码简洁性</p></div>
+        <div class="tech-card" style="--i:1"><div class="tech-icon cyan">🚀</div><h3>Spring Boot 3.2</h3><p>内嵌 Tomcat，自动配置，Jakarta EE 规范，快速构建 REST API</p></div>
+        <div class="tech-card" style="--i:2"><div class="tech-icon green">🗃️</div><h3>MyBatis-Plus 3.5</h3><p>增强 CRUD 操作，分页插件，逻辑删除，乐观锁，代码生成</p></div>
+        <div class="tech-card" style="--i:3"><div class="tech-icon amber">🐬</div><h3>MySQL 5.7+</h3><p>InnoDB 引擎，utf8mb4 字符集，索引优化，事务支持</p></div>
+    </div>
+</section>
+
+<section class="section" id="architecture">
+    <div class="section-header reveal">
+        <span class="section-tag">Architecture</span>
+        <h2 class="section-title">系统架构</h2>
+        <p class="section-desc">清晰的分层架构设计，职责分离，易于扩展和维护</p>
+    </div>
+
+    <!-- Mermaid Architecture Diagram -->
+    <div class="mermaid-container reveal">
+        <pre class="mermaid">
+graph TB
+    subgraph 前端
+        Vue[Vue 3 + Vite]
+    end
+
+    subgraph SpringBoot[Spring Boot 应用层]
+        Controller[Controller REST API]
+        Interceptor[拦截器 幂等校验]
+        Exception[全局异常处理器]
+
+        subgraph Service[Service 业务层]
+            ReimForm[报销单 Service]
+            Itinerary[行程管理 Service]
+            Subsidy[补助计算 Service]
+            StatusLog[状态日志 Service]
+        end
+
+        subgraph DAO[数据访问层 MyBatis-Plus]
+            MapperXML[Mapper XML]
+            MapperInterface[Mapper 接口]
+            PagePlugin[分页插件]
+        end
+    end
+
+    subgraph MySQL[MySQL 数据库]
+        T1[报销单]
+        T2[行程表]
+        T3[补助表]
+        T4[日历表]
+        T5[日志表]
+    end
+
+    Vue -->|HTTP REST API| Controller
+    Controller --> Interceptor
+    Controller --> Exception
+    Controller --> Service
+    Service --> DAO
+    DAO -->|JDBC| MySQL
+
+    style Vue fill:#E8F5E9,stroke:#4CAF50
+    style SpringBoot fill:#E3F2FD,stroke:#2196F3
+    style Controller fill:#BBDEFB,stroke:#2196F3
+    style Service fill:#C8E6C9,stroke:#4CAF50
+    style DAO fill:#FFF3E0,stroke:#FF9800
+    style MySQL fill:#FFEBEE,stroke:#F44336
+        </pre>
+    </div>
+</section>
+
+<section class="section" id="features">
+    <div class="section-header reveal">
+        <span class="section-tag">Highlights</span>
+        <h2 class="section-title">技术亮点</h2>
+        <p class="section-desc">解决核心业务场景中的技术难题，确保系统高性能与高可靠</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card reveal-left">
+            <div class="feature-header"><div class="feature-number">1</div><h3>N+1 查询优化</h3></div>
+            <p>使用 CompletableFuture 并行查询 4 张关联表，将串行查询改为并行执行，列表查询性能提升 3 倍。</p>
+            <div class="code-block">
+<span class="comment">// 并行查询4个关联表</span>
+<span class="type">CompletableFuture</span>&lt;<span class="type">Map</span>&lt;String, ReimEmployee&gt;&gt; empFuture =
+    <span class="type">CompletableFuture</span>.supplyAsync(() -&gt; {
+        <span class="keyword">return</span> employeeService.list(wrapper).stream()
+            .collect(Collectors.toMap(...));
+    }, reimQueryExecutor);
+
+<span class="type">CompletableFuture</span>.allOf(empFuture, deptFuture,
+    compFuture, btFuture).join();</div>
+        </div>
+        <div class="feature-card reveal-right">
+            <div class="feature-header"><div class="feature-number">2</div><h3>幂等性保障</h3></div>
+            <p>基于 ConcurrentHashMap 实现轻量级幂等校验拦截器，3 秒自动过期，防止重复提交。</p>
+            <div class="code-block">
+<span class="keyword">public class</span> <span class="type">IdempotentSubmitInterceptor</span> {
+    <span class="keyword">private static final</span> <span class="type">ConcurrentHashMap</span>&lt;String, Long&gt;
+        REQUEST_MAP = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();
+
+    <span class="annotation">@Override</span>
+    <span class="keyword">public boolean</span> preHandle(...) {
+        String key = <span class="string">"form_submit:"</span> + formUid + <span class="string">":"</span> + action;
+        <span class="keyword">if</span> (!IdempotentUtil.tryAcquire(key)) {
+            <span class="keyword">return false</span>;
+        }
+        <span class="keyword">return true</span>;
+    }
+}</div>
+        </div>
+        <div class="feature-card reveal-left">
+            <div class="feature-header"><div class="feature-number">3</div><h3>乐观锁并发控制</h3></div>
+            <p>使用 MyBatis-Plus @Version 注解实现乐观锁，配合状态校验和全局异常处理，三层防护确保并发安全。</p>
+            <div class="code-block">
+<span class="annotation">@Version</span>
+<span class="keyword">private</span> <span class="type">Integer</span> version;
+
+<span class="comment">// 全局异常处理器捕获乐观锁冲突</span>
+<span class="annotation">@ExceptionHandler</span>(OptimisticLockException.<span class="keyword">class</span>)
+<span class="keyword">public</span> <span class="type">Result</span>&lt;String&gt; handle(...) {
+    <span class="keyword">return</span> <span class="type">Result</span>.error(<span class="string">409</span>,
+        <span class="string">"数据已被其他人修改，请刷新后重试"</span>, <span class="keyword">null</span>);
+}</div>
+        </div>
+        <div class="feature-card reveal-right">
+            <div class="feature-header"><div class="feature-number">4</div><h3>状态机设计</h3></div>
+            <p>使用枚举定义报销单状态，严格校验状态流转规则，防止非法操作，记录每次状态变更日志。</p>
+            <div class="state-machine">
+                <div class="state-node active"><div class="state-name">未提交</div><div class="state-code">DRAFT</div></div>
+                <div class="state-arrow">→</div>
+                <div class="state-node"><div class="state-name">已提交</div><div class="state-code">SUBMITTED</div></div>
+                <div class="state-arrow">→</div>
+                <div class="state-node"><div class="state-name">已作废</div><div class="state-code">CANCELED</div></div>
+            </div>
+        </div>
+        <div class="feature-card reveal-left">
+            <div class="feature-header"><div class="feature-number">5</div><h3>线程池隔离</h3></div>
+            <p>配置两个独立线程池，异步任务与并行查询互不影响，CallerRunsPolicy 确保任务不丢失。</p>
+            <div class="code-block">
+<span class="annotation">@Bean</span>(<span class="string">"reimQueryExecutor"</span>)
+<span class="keyword">public</span> <span class="type">Executor</span> reimQueryExecutor() {
+    ThreadPoolTaskExecutor executor = <span class="keyword">new</span> ...();
+    executor.setCorePoolSize(<span class="string">4</span>);
+    executor.setMaxPoolSize(<span class="string">8</span>);
+    executor.setQueueCapacity(<span class="string">50</span>);
+    executor.setRejectedExecutionHandler(
+        <span class="keyword">new</span> CallerRunsPolicy());
+    <span class="keyword">return</span> executor;
+}</div>
+        </div>
+        <div class="feature-card reveal-right">
+            <div class="feature-header"><div class="feature-number">6</div><h3>金额精度保障</h3></div>
+            <p>所有金额字段统一使用"分"为单位（INT类型），避免浮点数精度丢失，前端展示时再转换为元。</p>
+            <div class="code-block">
+<span class="comment">// 补助标准配置（单位：分）</span>
+<span class="keyword">private static final int</span>[] FIRST  = {<span class="string">10000</span>, <span class="string">4000</span>, <span class="string">4000</span>};
+<span class="keyword">private static final int</span>[] SECOND = {<span class="string">8000</span>,  <span class="string">4000</span>, <span class="string">4000</span>};
+<span class="keyword">private static final int</span>[] THIRD  = {<span class="string">5000</span>,  <span class="string">4000</span>, <span class="string">4000</span>};
+
+<span class="comment">// 一线城市：餐补¥100/天  交通¥40/天  通讯¥40/天</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="database">
+    <div class="section-header reveal">
+        <span class="section-tag">Database</span>
+        <h2 class="section-title">数据库设计</h2>
+        <p class="section-desc">10 张业务表，合理的索引策略和约束设计</p>
+    </div>
+    <div class="db-tables stagger">
+        <div class="db-table" style="--i:0">
+            <div class="db-table-header"><div class="db-table-icon">📋</div><h4>reim_form 报销单主表</h4></div>
+            <div class="db-table-body">
+                <div class="db-field special"><span class="db-field-name">form_uid</span><span class="db-field-type">BIGINT PK AUTO</span></div>
+                <div class="db-field"><span class="db-field-name">order_no</span><span class="db-field-type">VARCHAR(50) UK</span></div>
+                <div class="db-field"><span class="db-field-name">title</span><span class="db-field-type">VARCHAR(200)</span></div>
+                <div class="db-field special"><span class="db-field-name">status</span><span class="db-field-type">TINYINT (1-4)</span></div>
+                <div class="db-field special"><span class="db-field-name">version</span><span class="db-field-type">INT 乐观锁</span></div>
+                <div class="db-field special"><span class="db-field-name">deleted</span><span class="db-field-type">TINYINT 逻辑删除</span></div>
+            </div>
+        </div>
+        <div class="db-table" style="--i:1">
+            <div class="db-table-header"><div class="db-table-icon">🚄</div><h4>reim_itinerary 行程表</h4></div>
+            <div class="db-table-body">
+                <div class="db-field special"><span class="db-field-name">itinerary_uid</span><span class="db-field-type">BIGINT PK AUTO</span></div>
+                <div class="db-field"><span class="db-field-name">form_id</span><span class="db-field-type">BIGINT FK</span></div>
+                <div class="db-field"><span class="db-field-name">traveler_id</span><span class="db-field-type">VARCHAR(50) FK</span></div>
+                <div class="db-field"><span class="db-field-name">departure_city_no</span><span class="db-field-type">VARCHAR(20)</span></div>
+                <div class="db-field"><span class="db-field-name">arrival_city_no</span><span class="db-field-type">VARCHAR(20)</span></div>
+                <div class="db-field"><span class="db-field-name">departure_date ~ arrival_date</span><span class="db-field-type">DATE</span></div>
+            </div>
+        </div>
+        <div class="db-table" style="--i:2">
+            <div class="db-table-header"><div class="db-table-icon">💰</div><h4>reim_subsidy 补助信息表</h4></div>
+            <div class="db-table-body">
+                <div class="db-field special"><span class="db-field-name">subsidy_uid</span><span class="db-field-type">BIGINT PK AUTO</span></div>
+                <div class="db-field"><span class="db-field-name">form_id</span><span class="db-field-type">BIGINT FK</span></div>
+                <div class="db-field"><span class="db-field-name">itinerary_id</span><span class="db-field-type">BIGINT FK 1:1</span></div>
+                <div class="db-field"><span class="db-field-name">subsidy_city_no</span><span class="db-field-type">VARCHAR(20)</span></div>
+                <div class="db-field"><span class="db-field-name">apply_amount</span><span class="db-field-type">INT (分)</span></div>
+                <div class="db-field"><span class="db-field-name">subsidy_amount</span><span class="db-field-type">INT (分)</span></div>
+            </div>
+        </div>
+        <div class="db-table" style="--i:3">
+            <div class="db-table-header"><div class="db-table-icon">📅</div><h4>reim_subsidy_calendar 补助日历</h4></div>
+            <div class="db-table-body">
+                <div class="db-field special"><span class="db-field-name">calendar_uid</span><span class="db-field-type">BIGINT PK AUTO</span></div>
+                <div class="db-field"><span class="db-field-name">subsidy_id</span><span class="db-field-type">BIGINT FK</span></div>
+                <div class="db-field"><span class="db-field-name">date</span><span class="db-field-type">DATE</span></div>
+                <div class="db-field"><span class="db-field-name">meal_selected / amount</span><span class="db-field-type">TINYINT / INT</span></div>
+                <div class="db-field"><span class="db-field-name">transport_selected / amount</span><span class="db-field-type">TINYINT / INT</span></div>
+                <div class="db-field"><span class="db-field-name">comm_selected / amount</span><span class="db-field-type">TINYINT / INT</span></div>
+            </div>
+        </div>
+        <div class="db-table" style="--i:4">
+            <div class="db-table-header"><div class="db-table-icon">📝</div><h4>reim_status_log 状态日志</h4></div>
+            <div class="db-table-body">
+                <div class="db-field special"><span class="db-field-name">log_uid</span><span class="db-field-type">BIGINT PK AUTO</span></div>
+                <div class="db-field"><span class="db-field-name">form_id</span><span class="db-field-type">BIGINT FK</span></div>
+                <div class="db-field"><span class="db-field-name">from_status → to_status</span><span class="db-field-type">TINYINT</span></div>
+                <div class="db-field"><span class="db-field-name">operator_id</span><span class="db-field-type">VARCHAR(50)</span></div>
+                <div class="db-field"><span class="db-field-name">operate_time</span><span class="db-field-type">DATETIME</span></div>
+            </div>
+        </div>
+        <div class="db-table" style="--i:5">
+            <div class="db-table-header"><div class="db-table-icon">🏢</div><h4>基础数据表 (5张)</h4></div>
+            <div class="db-table-body">
+                <div class="db-field"><span class="db-field-name">reim_company</span><span class="db-field-type">费用归属公司</span></div>
+                <div class="db-field"><span class="db-field-name">reim_department</span><span class="db-field-type">部门</span></div>
+                <div class="db-field"><span class="db-field-name">reim_employee</span><span class="db-field-type">员工</span></div>
+                <div class="db-field"><span class="db-field-name">base_business_type</span><span class="db-field-type">业务类型(树形)</span></div>
+                <div class="db-field"><span class="db-field-name">base_city</span><span class="db-field-type">城市(一线/二线/三线)</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header reveal">
+        <span class="section-tag">Demo</span>
+        <h2 class="section-title">补助计算示例</h2>
+        <p class="section-desc">根据城市类型自动匹配补助标准，按天粒度记录补助明细</p>
+    </div>
+    <div class="subsidy-demo reveal">
+        <table class="subsidy-table">
+            <thead><tr><th>日期</th><th>城市</th><th>餐补</th><th>交通补助</th><th>通讯补助</th><th>小计</th></tr></thead>
+            <tbody>
+                <tr><td>2026-05-20</td><td><span class="badge badge-blue">北京 (一线)</span></td><td>¥100.00</td><td>¥40.00</td><td>¥40.00</td><td><strong>¥180.00</strong></td></tr>
+                <tr><td>2026-05-21</td><td><span class="badge badge-blue">北京 (一线)</span></td><td>¥100.00</td><td>¥40.00</td><td>¥40.00</td><td><strong>¥180.00</strong></td></tr>
+                <tr><td>2026-05-22</td><td><span class="badge badge-cyan">杭州 (二线)</span></td><td>¥80.00</td><td>¥40.00</td><td>¥40.00</td><td><strong>¥160.00</strong></td></tr>
+                <tr><td>2026-05-23</td><td><span class="badge badge-green">嘉兴 (三线)</span></td><td>¥50.00</td><td>¥40.00</td><td>¥0.00</td><td><strong>¥90.00</strong></td></tr>
+                <tr style="background: var(--primary-bg);"><td colspan="5" style="text-align: right; font-weight: 600;">补助合计</td><td><strong style="color: var(--primary); font-size: 1.1rem;">¥610.00</strong></td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section" id="challenges">
+    <div class="section-header reveal">
+        <span class="section-tag">Challenges</span>
+        <h2 class="section-title">技术挑战与解决方案</h2>
+        <p class="section-desc">深入业务场景，针对性解决核心技术难题</p>
+    </div>
+    <div class="accordion reveal">
+        <div class="accordion-item">
+            <div class="accordion-header"><div class="accordion-icon">1</div><h3>N+1 查询性能瓶颈</h3><span class="accordion-arrow">▼</span></div>
+            <div class="accordion-body"><div class="accordion-body-inner">
+                <span class="label">问题</span><p>报销单列表查询时，每条记录需关联查询员工、部门、公司、业务类型 4 张表，10 条记录产生 40+ 次 SQL 查询。</p>
+                <span class="label">解决方案</span><p>使用 CompletableFuture 并行查询，先收集所有关联 ID，批量查询后构建 Map 缓存，从缓存中获取关联数据。查询时间从 O(N×4) 降为 O(1)。</p>
+                <div class="code-block">
+<span class="comment">// 收集所有不重复的关联ID</span>
+Set&lt;String&gt; reimburserIds = forms.stream()
+    .map(ReimForm::getReimburserId)
+    .filter(Objects::nonNull)
+    .collect(Collectors.toSet());
+
+<span class="comment">// CompletableFuture并行查询4个关联表</span>
+<span class="type">CompletableFuture</span>.allOf(empFuture, deptFuture,
+    compFuture, btFuture).join();</div>
+            </div></div>
+        </div>
+        <div class="accordion-item">
+            <div class="accordion-header"><div class="accordion-icon">2</div><h3>重复提交导致数据异常</h3><span class="accordion-arrow">▼</span></div>
+            <div class="accordion-body"><div class="accordion-body-inner">
+                <span class="label">问题</span><p>用户快速双击提交按钮，前端未做防抖处理，导致后端收到两次请求，产生重复数据。</p>
+                <span class="label">解决方案</span><p>实现基于 ConcurrentHashMap 的幂等校验拦截器。通过 formUid + 操作路径生成唯一 key，3 秒内重复请求直接拒绝。定时任务每 10 秒清理过期 key。</p>
+                <div class="code-block">
+<span class="keyword">public static boolean</span> tryAcquire(String key) {
+    Long previous = REQUEST_MAP.putIfAbsent(
+        key, System.currentTimeMillis() + <span class="string">3000</span>);
+    <span class="keyword">return</span> previous == <span class="keyword">null</span>;
+}</div>
+            </div></div>
+        </div>
+        <div class="accordion-item">
+            <div class="accordion-header"><div class="accordion-icon">3</div><h3>并发更新数据覆盖</h3><span class="accordion-arrow">▼</span></div>
+            <div class="accordion-body"><div class="accordion-body-inner">
+                <span class="label">问题</span><p>多人同时编辑同一报销单，后提交的覆盖先提交的修改，导致数据丢失。</p>
+                <span class="label">解决方案</span><p>采用三层防护：①乐观锁 version 字段控制更新冲突；②操作前校验单据状态是否允许；③全局异常处理器捕获乐观锁异常，返回友好提示。</p>
+                <div class="code-block">
+<span class="annotation">@Version</span>
+<span class="keyword">private</span> <span class="type">Integer</span> version;
+
+<span class="comment">// updateById 时自动带 WHERE version = ?</span>
+<span class="comment">// 版本不匹配则更新失败，触发乐观锁异常</span></div>
+            </div></div>
+        </div>
+        <div class="accordion-item">
+            <div class="accordion-header"><div class="accordion-icon">4</div><h3>补助金额级联计算</h3><span class="accordion-arrow">▼</span></div>
+            <div class="accordion-body"><div class="accordion-body-inner">
+                <span class="label">问题</span><p>修改某一天的补助明细后，需要同步更新补助总额和报销单总额，涉及多表联动。</p>
+                <span class="label">解决方案</span><p>设计级联重算机制：日历明细修改 → 重算当前补助总额 → 重算报销单总额。使用 @Transactional 保证数据一致性。</p>
+                <div class="code-block">
+<span class="comment">// 级联重算流程</span>
+日历明细修改 → recalculateSubsidyTotal(subsidyUid)
+            → recalculateFormTotals(formUid)
+
+<span class="comment">// 汇总所有未删除的日历明细</span>
+<span class="keyword">for</span> (ReimSubsidyCalendar cal : calendars) {
+    <span class="keyword">if</span> (cal.getMealSelected() == <span class="string">1</span>)
+        mealTotal += cal.getMealActualAmount();
+}</div>
+            </div></div>
+        </div>
+        <div class="accordion-item">
+            <div class="accordion-header"><div class="accordion-icon">5</div><h3>浮点数精度丢失</h3><span class="accordion-arrow">▼</span></div>
+            <div class="accordion-body"><div class="accordion-body-inner">
+                <span class="label">问题</span><p>使用 double/float 存储金额，累加计算时出现精度丢失（如 0.1 + 0.2 ≠ 0.3）。</p>
+                <span class="label">解决方案</span><p>所有金额字段统一使用"分"为单位，以 INT 类型存储。前端展示时再除以 100 转换为元。彻底避免浮点数精度问题。</p>
+                <div class="code-block">
+<span class="comment">// 数据库存储：10000（分）</span>
+<span class="comment">// 前端展示：10000 / 100 = ¥100.00</span>
+
+<span class="comment">// 补助标准配置（单位：分）</span>
+<span class="keyword">private static final int</span>[] FIRST = {<span class="string">10000</span>, <span class="string">4000</span>, <span class="string">4000</span>};
+<span class="comment">// 一线城市：餐补¥100/天 交通¥40/天 通讯¥40/天</span></div>
+            </div></div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="metrics">
+    <div class="section-header reveal">
+        <span class="section-tag">Metrics</span>
+        <h2 class="section-title">项目数据</h2>
+        <p class="section-desc">量化项目规模和技术深度</p>
+    </div>
+    <div class="metrics-grid stagger">
+        <div class="metric-card" style="--i:0"><div class="metric-value" data-count="10">0</div><div class="metric-label">业务数据表</div></div>
+        <div class="metric-card" style="--i:1"><div class="metric-value" data-count="11">0</div><div class="metric-label">REST API 接口</div></div>
+        <div class="metric-card" style="--i:2"><div class="metric-value" data-count="10">0</div><div class="metric-label">Service 服务类</div></div>
+        <div class="metric-card" style="--i:3"><div class="metric-value" data-count="10">0</div><div class="metric-label">Mapper 接口</div></div>
+        <div class="metric-card" style="--i:4"><div class="metric-value" data-count="3000">0</div><div class="metric-label">代码行数</div></div>
+        <div class="metric-card" style="--i:5"><div class="metric-value" data-count="6">0</div><div class="metric-label">配置类</div></div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header reveal">
+        <span class="section-tag">API Design</span>
+        <h2 class="section-title">接口设计</h2>
+        <p class="section-desc">RESTful 风格，统一响应格式，清晰的资源路径</p>
+    </div>
+    <div class="subsidy-demo reveal">
+        <table class="subsidy-table">
+            <thead><tr><th>模块</th><th>方法</th><th>路径</th><th>说明</th></tr></thead>
+            <tbody>
+                <tr><td><span class="badge badge-blue">报销单</span></td><td>GET</td><td><code>/api/reimbursement/forms</code></td><td>分页查询</td></tr>
+                <tr><td><span class="badge badge-blue">报销单</span></td><td>POST</td><td><code>/api/reimbursement/forms</code></td><td>创建报销单</td></tr>
+                <tr><td><span class="badge badge-blue">报销单</span></td><td>PUT</td><td><code>/api/reimbursement/forms/{id}</code></td><td>编辑报销单</td></tr>
+                <tr><td><span class="badge badge-blue">报销单</span></td><td>DELETE</td><td><code>/api/reimbursement/forms/{id}</code></td><td>删除报销单</td></tr>
+                <tr><td><span class="badge badge-blue">报销单</span></td><td>POST</td><td><code>/api/reimbursement/forms/{id}/submit</code></td><td>提交审批</td></tr>
+                <tr><td><span class="badge badge-blue">报销单</span></td><td>POST</td><td><code>/api/reimbursement/forms/{id}/withdraw</code></td><td>撤回提交</td></tr>
+                <tr><td><span class="badge badge-blue">报销单</span></td><td>POST</td><td><code>/api/reimbursement/forms/{id}/cancel</code></td><td>作废单据</td></tr>
+                <tr><td><span class="badge badge-cyan">行程</span></td><td>GET</td><td><code>/api/reim-itineraries/form/{formId}</code></td><td>查询行程列表</td></tr>
+                <tr><td><span class="badge badge-green">补助</span></td><td>GET</td><td><code>/api/reim-subsidies/form/{formId}</code></td><td>查询补助列表</td></tr>
+                <tr><td><span class="badge badge-amber">日历</span></td><td>POST</td><td><code>/api/subsidy-calendars/batch-save</code></td><td>批量保存日历</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-links">
+        <a href="#tech">技术栈</a>
+        <a href="#architecture">架构设计</a>
+        <a href="#features">技术亮点</a>
+        <a href="#database">数据库</a>
+        <a href="#challenges">挑战与方案</a>
+        <a href="#metrics">项目数据</a>
+    </div>
+    <p>差旅报销管理系统 · 后端开发作品集</p>
+    <p style="margin-top: 0.5rem; color: var(--text-muted);">Spring Boot 3.2 + MyBatis-Plus 3.5 + MySQL + Java 17</p>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .stagger').forEach(el => observer.observe(el));
+
+window.addEventListener('scroll', () => {
+    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+function animateCounters() {
+    document.querySelectorAll('[data-count]').forEach(el => {
+        const target = parseInt(el.dataset.count);
+        const duration = 1500; const start = performance.now();
+        function update(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            el.textContent = Math.round(target * (1 - Math.pow(1 - progress, 3))).toLocaleString();
+            if (progress < 1) requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update);
+    });
+}
+const heroObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) { animateCounters(); heroObserver.unobserve(entry.target); } });
+}, { threshold: 0.5 });
+const heroStats = document.querySelector('.hero-stats');
+if (heroStats) heroObserver.observe(heroStats);
+
+const metricsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.querySelectorAll('[data-count]').forEach(el => {
+                const target = parseInt(el.dataset.count);
+                const duration = 1500; const start = performance.now();
+                function update(now) {
+                    const progress = Math.min((now - start) / duration, 1);
+                    el.textContent = Math.round(target * (1 - Math.pow(1 - progress, 3))).toLocaleString();
+                    if (progress < 1) requestAnimationFrame(update);
+                }
+                requestAnimationFrame(update);
+            });
+            metricsObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.3 });
+document.querySelectorAll('.metrics-grid').forEach(el => metricsObserver.observe(el));
+
+document.querySelectorAll('.accordion-header').forEach(header => {
+    header.addEventListener('click', () => {
+        const item = header.parentElement;
+        const body = item.querySelector('.accordion-body');
+        const isActive = item.classList.contains('active');
+        document.querySelectorAll('.accordion-item').forEach(i => { i.classList.remove('active'); i.querySelector('.accordion-body').style.maxHeight = '0'; });
+        if (!isActive) { item.classList.add('active'); body.style.maxHeight = body.scrollHeight + 'px'; }
+    });
+});
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+
+mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    securityLevel: 'loose',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif',
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+});
+</script>
+
+</body>
+</html>

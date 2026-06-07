@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>张雯炫 — 后端 & AI 应用开发作品集</title>
+<style>
+/* ===== CSS Variables ===== */
+:root {
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-hero: linear-gradient(135deg, #1E3A5F 0%, #2563EB 50%, #7C3AED 100%);
+  --text: #1E293B;
+  --text-dim: #64748B;
+  --text-light: #94A3B8;
+  --border: #E2E8F0;
+  --primary: #2563EB;
+  --primary-light: #3B82F6;
+  --accent: #7C3AED;
+  --accent-light: #8B5CF6;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+  --radius: 12px;
+  --radius-lg: 20px;
+}
+
+/* ===== Reset ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ===== Scroll Progress ===== */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  z-index: 1000;
+  transition: width 0.1s;
+}
+
+/* ===== Navigation ===== */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  background: rgba(248,250,252,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.3s;
+}
+.nav.scrolled {
+  padding: 12px 40px;
+  box-shadow: var(--shadow);
+}
+.nav-logo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+}
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s;
+  position: relative;
+}
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--primary);
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary);
+  transition: width 0.3s;
+}
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  width: 100%;
+}
+
+/* ===== Hero Section ===== */
+.hero {
+  min-height: 100vh;
+  background: var(--bg-hero);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 120px 40px 80px;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+}
+.hero-badge {
+  display: inline-block;
+  padding: 8px 20px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 50px;
+  color: rgba(255,255,255,0.9);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 24px;
+  backdrop-filter: blur(10px);
+}
+.hero h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.hero h1 .highlight {
+  background: linear-gradient(135deg, #60A5FA, #A78BFA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin-bottom: 40px;
+}
+.stat-item {
+  text-align: center;
+}
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  display: block;
+}
+.stat-label {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+  margin-top: 4px;
+}
+.hero-cta {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+.btn {
+  padding: 14px 28px;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-primary {
+  background: white;
+  color: var(--primary);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.btn-outline {
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255,255,255,0.4);
+}
+.btn-outline:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: white;
+}
+
+/* ===== Floating Particles ===== */
+.particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  animation: float 15s infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+}
+
+/* ===== Section Common ===== */
+.section {
+  padding: 100px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+.section-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(37,99,235,0.1);
+  color: var(--primary);
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.section-desc {
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ===== Tech Stack Section ===== */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.tech-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  transition: all 0.3s;
+}
+.tech-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+.tech-card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+.tech-card-icon.backend { background: rgba(37,99,235,0.1); color: var(--primary); }
+.tech-card-icon.ai { background: rgba(124,58,237,0.1); color: var(--accent); }
+.tech-card-icon.db { background: rgba(16,185,129,0.1); color: var(--success); }
+.tech-card-icon.ops { background: rgba(245,158,11,0.1); color: var(--warning); }
+.tech-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.tech-card ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tech-card li {
+  padding: 4px 12px;
+  background: var(--bg);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+/* ===== Projects Section ===== */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+.project-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.4s;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+}
+.project-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+.project-card-header {
+  padding: 28px 28px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.project-card-badge {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+  width: fit-content;
+}
+.project-card-badge.ai {
+  background: rgba(124,58,237,0.1);
+  color: var(--accent);
+}
+.project-card-badge.backend {
+  background: rgba(37,99,235,0.1);
+  color: var(--primary);
+}
+.project-card-badge.fullstack {
+  background: rgba(16,185,129,0.1);
+  color: var(--success);
+}
+.project-card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.project-card-desc {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  flex: 1;
+}
+.project-card-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.metric {
+  text-align: center;
+}
+.metric-value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary);
+  display: block;
+}
+.metric-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.project-card-footer {
+  padding: 14px 28px;
+  background: var(--bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border);
+}
+.project-card-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.project-card-tech span {
+  padding: 3px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+.project-card-arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+.project-card:hover .project-card-arrow {
+  transform: translateX(4px);
+  background: var(--accent);
+}
+
+/* ===== Skills Matrix Section ===== */
+.skills-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+.skill-category {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+}
+.skill-category h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.skill-category h3 .icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+.skill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.skill-item:last-child {
+  border-bottom: none;
+}
+.skill-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.skill-bar {
+  width: 100px;
+  height: 6px;
+  background: var(--bg);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.skill-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+.skill-bar-fill.backend { background: var(--primary); }
+.skill-bar-fill.ai { background: var(--accent); }
+.skill-bar-fill.ops { background: var(--success); }
+
+/* ===== Contact Section ===== */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+.contact-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.contact-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.contact-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(37,99,235,0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin: 0 auto 16px;
+}
+.contact-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.contact-card p {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+.contact-card a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.contact-card a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Footer ===== */
+.footer {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ===== Back to Top ===== */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(37,99,235,0.3);
+  border: none;
+  z-index: 99;
+}
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+.back-to-top:hover {
+  transform: translateY(-3px);
+  background: var(--accent);
+}
+
+/* ===== Reveal Animation ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+  .tech-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .projects-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav { padding: 12px 20px; }
+  .nav-links { display: none; }
+  .hero { padding: 100px 20px 60px; }
+  .hero h1 { font-size: 2.5rem; }
+  .hero-stats { gap: 24px; }
+  .stat-number { font-size: 2rem; }
+  .section { padding: 60px 20px; }
+  .section-title { font-size: 2rem; }
+  .tech-grid { grid-template-columns: repeat(2, 1fr); }
+  .projects-grid { grid-template-columns: 1fr; }
+  .skills-container { grid-template-columns: 1fr; }
+  .hero-cta { flex-direction: column; align-items: center; }
+}
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: 2rem; }
+  .hero-stats { flex-direction: column; gap: 16px; }
+  .tech-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .project-card-metrics { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .metric-value { font-size: 1.2rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Scroll Progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Navigation -->
+<nav class="nav" id="mainNav">
+  <a href="#" class="nav-logo">张雯炫</a>
+  <ul class="nav-links">
+    <li><a href="#home" class="active">首页</a></li>
+    <li><a href="#tech">技术栈</a></li>
+    <li><a href="#projects">项目</a></li>
+    <li><a href="#skills">能力</a></li>
+    <li><a href="#contact">联系</a></li>
+  </ul>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+  <div class="particles" id="particles"></div>
+  <div class="hero-content">
+    <div class="hero-badge">后端开发工程师 · AI 应用开发工程师</div>
+    <h1>构建<span class="highlight">智能后端</span>系统</h1>
+    <p class="hero-subtitle">
+      专注于后端架构设计与 AI 应用落地，擅长将大模型能力工程化，打造稳定、高效、智能的后端服务
+    </p>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-number" data-target="5">0</span>
+        <span class="stat-label">核心项目</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="20">0</span>
+        <span class="stat-label">数据库表</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="25">0</span>
+        <span class="stat-label">API 接口</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="9">0</span>
+        <span class="stat-label">设计模式</span>
+      </div>
+    </div>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">查看项目</a>
+      <a href="#contact" class="btn btn-outline">联系我</a>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack Section -->
+<section class="section" id="tech">
+  <div class="section-header reveal">
+    <span class="section-badge">技术栈</span>
+    <h2 class="section-title">全栈技术能力</h2>
+    <p class="section-desc">覆盖后端开发、AI 应用、数据库、工程化部署四大领域</p>
+  </div>
+  <div class="tech-grid">
+    <div class="tech-card reveal">
+      <div class="tech-card-icon backend">⚙️</div>
+      <h3>后端开发</h3>
+      <ul>
+        <li>Python</li>
+        <li>FastAPI</li>
+        <li>Flask</li>
+        <li>Java</li>
+        <li>Spring Boot</li>
+        <li>MyBatis-Plus</li>
+      </ul>
+    </div>
+    <div class="tech-card reveal">
+      <div class="tech-card-icon ai">🤖</div>
+      <h3>AI 应用</h3>
+      <ul>
+        <li>LLM API</li>
+        <li>RAG</li>
+        <li>Agent</li>
+        <li>Prompt Engineering</li>
+        <li>多智能体</li>
+        <li>工具调用</li>
+      </ul>
+    </div>
+    <div class="tech-card reveal">
+      <div class="tech-card-icon db">🗄️</div>
+      <h3>数据库</h3>
+      <ul>
+        <li>MySQL</li>
+        <li>PostgreSQL</li>
+        <li>SQLite</li>
+        <li>Redis</li>
+        <li>SQLAlchemy</li>
+        <li>ER 建模</li>
+      </ul>
+    </div>
+    <div class="tech-card reveal">
+      <div class="tech-card-icon ops">🚀</div>
+      <h3>工程化</h3>
+      <ul>
+        <li>Docker</li>
+        <li>Docker Compose</li>
+        <li>Nginx</li>
+        <li>GitHub Actions</li>
+        <li>JWT 认证</li>
+        <li>设计模式</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Projects Section -->
+<section class="section" id="projects">
+  <div class="section-header reveal">
+    <span class="section-badge">项目经历</span>
+    <h2 class="section-title">核心项目展示</h2>
+    <p class="section-desc">点击卡片查看详细作品集</p>
+  </div>
+  <div class="projects-grid">
+    <!-- Project 1: 楚韵钩沉 -->
+    <a href="./chu.html" class="project-card reveal">
+      <div class="project-card-header">
+        <span class="project-card-badge ai">RAG</span>
+        <h3>楚韵文字</h3>
+        <p class="project-card-desc">
+          楚文化数字资源活化平台，集成 RAG 知识库问答系统，获挑战杯国家级二等奖
+        </p>
+        <div class="project-card-metrics">
+          <div class="metric">
+            <span class="metric-value">110万</span>
+            <span class="metric-label">字古籍</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">4000+</span>
+            <span class="metric-label">用户</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">8</span>
+            <span class="metric-label">API 接口</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-card-footer">
+        <div class="project-card-tech">
+          <span>Flask</span>
+          <span>RAG</span>
+          <span>Docker</span>
+          <span>PostgreSQL</span>
+        </div>
+        <div class="project-card-arrow">→</div>
+      </div>
+    </a>
+
+    <!-- Project 2: 差旅报销系统 -->
+    <a href="./travel-reimbursement.html" class="project-card reveal">
+      <div class="project-card-header">
+        <span class="project-card-badge backend">Spring Boot</span>
+        <h3>差旅报销管理系统</h3>
+        <p class="project-card-desc">
+          企业级后端系统，实现并发安全三层防护、N+1 查询优化，性能提升 3 倍
+        </p>
+        <div class="project-card-metrics">
+          <div class="metric">
+            <span class="metric-value">10</span>
+            <span class="metric-label">数据表</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">11</span>
+            <span class="metric-label">API 接口</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">3x</span>
+            <span class="metric-label">性能提升</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-card-footer">
+        <div class="project-card-tech">
+          <span>Spring Boot</span>
+          <span>MyBatis-Plus</span>
+          <span>MySQL</span>
+          <span>Redis</span>
+        </div>
+        <div class="project-card-arrow">→</div>
+      </div>
+    </a>
+
+    <!-- Project 3: 智能选课系统 -->
+    <a href="./smart-course-selection.html" class="project-card reveal">
+      <div class="project-card-header">
+        <span class="project-card-badge ai">AI Agent</span>
+        <h3>智能选课系统</h3>
+        <p class="project-card-desc">
+          基于 AI Agent 架构的对话式选课平台，支持自然语言交互，6 种工具能力覆盖选课全流程
+        </p>
+        <div class="project-card-metrics">
+          <div class="metric">
+            <span class="metric-value">6</span>
+            <span class="metric-label">Agent 工具</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">9</span>
+            <span class="metric-label">设计模式</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">4</span>
+            <span class="metric-label">数据表</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-card-footer">
+        <div class="project-card-tech">
+          <span>FastAPI</span>
+          <span>Vue 3</span>
+          <span>AI Agent</span>
+          <span>SQLAlchemy</span>
+        </div>
+        <div class="project-card-arrow">→</div>
+      </div>
+    </a>
+
+    <!-- Project 4: 财搭子 -->
+    <a href="./finance-partner.html" class="project-card reveal">
+      <div class="project-card-header">
+        <span class="project-card-badge ai">多智能体</span>
+        <h3>财搭子</h3>
+        <p class="project-card-desc">
+          基于 Coze 平台的多智能体协作理财系统，三智能体分工提供个性化理财服务
+        </p>
+        <div class="project-card-metrics">
+          <div class="metric">
+            <span class="metric-value">3</span>
+            <span class="metric-label">智能体</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">1</span>
+            <span class="metric-label">小程序</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">100+</span>
+            <span class="metric-label">用户</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-card-footer">
+        <div class="project-card-tech">
+          <span>Coze</span>
+          <span>微信小程序</span>
+          <span>LLM API</span>
+          <span>工作流</span>
+        </div>
+        <div class="project-card-arrow">→</div>
+      </div>
+    </a>
+
+    <!-- Project 5: 飞书AI助手 -->
+    <a href="./feishu-ai-assistant.html" class="project-card reveal">
+      <div class="project-card-header">
+        <span class="project-card-badge ai">Agent</span>
+        <h3>飞书 AI 智能助手</h3>
+        <p class="project-card-desc">
+          基于 Hermes Agent 框架开发飞书 AI 助手，实现智能对话、任务管理与工作流自动化
+        </p>
+        <div class="project-card-metrics">
+          <div class="metric">
+            <span class="metric-value">50+</span>
+            <span class="metric-label">日均请求</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">3</span>
+            <span class="metric-label">自定义 Skills</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">0.5天</span>
+            <span class="metric-label">新功能周期</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-card-footer">
+        <div class="project-card-tech">
+          <span>Hermes Agent</span>
+          <span>飞书 API</span>
+          <span>APScheduler</span>
+          <span>Redis</span>
+        </div>
+        <div class="project-card-arrow">→</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- Skills Matrix Section -->
+<section class="section" id="skills">
+  <div class="section-header reveal">
+    <span class="section-badge">能力矩阵</span>
+    <h2 class="section-title">技术能力评估</h2>
+    <p class="section-desc">基于项目实践的能力自评</p>
+  </div>
+  <div class="skills-container">
+    <div class="skill-category reveal">
+      <h3>
+        <span class="icon" style="background:rgba(37,99,235,0.1);color:var(--primary)">⚙️</span>
+        后端开发
+      </h3>
+      <div class="skill-item">
+        <span class="skill-name">Spring Boot</span>
+        <div class="skill-bar"><div class="skill-bar-fill backend" style="width:85%"></div></div>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">FastAPI</span>
+        <div class="skill-bar"><div class="skill-bar-fill backend" style="width:90%"></div></div>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">Flask</span>
+        <div class="skill-bar"><div class="skill-bar-fill backend" style="width:85%"></div></div>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">RESTful API</span>
+        <div class="skill-bar"><div class="skill-bar-fill backend" style="width:90%"></div></div>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">设计模式</span>
+        <div class="skill-bar"><div class="skill-bar-fill backend" style="width:80%"></div></div>
+      </div>
+    </div>
+    <div class="skill-category reveal">
+      <h3>
+        <span class="icon" style="background:rgba(124,58,237,0.1);color:var(--accent)">🤖</span>
+        AI 应用
+      </h3>
+      <div class="skill-item">
+        <span class="skill-name">RAG 系统</span>
+        <div class="skill-bar"><div class="skill-bar-fill ai" style="width:85%"></div></div>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">Agent 开发</span>
+        <div class="skill-bar"><div class="skill-bar-fill ai" style="width:80%"></div></div>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">Prompt Engineering</span>
+        <div class="skill-bar"><div class="skill-bar-fill ai" style="width:90%"></div></div>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">LLM API 集成</span>
+        <div class="skill-bar"><div class="skill-bar-fill ai" style="width:85%"></div></div>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">多智能体协作</span>
+        <div class="skill-bar"><div class="skill-bar-fill ai" style="width:75%"></div></div>
+      </div>
+    </div>
+    <div class="skill-category reveal">
+      <h3>
+        <span class="icon" style="background:rgba(16,185,129,0.1);color:var(--success)">🚀</span>
+        工程化
+      </h3>
+      <div class="skill-item">
+        <span class="skill-name">数据库设计</span>
+        <div class="skill-bar"><div class="skill-bar-fill ops" style="width:85%"></div></div>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">Docker 部署</span>
+        <div class="skill-bar"><div class="skill-bar-fill ops" style="width:80%"></div></div>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">Nginx 配置</span>
+        <div class="skill-bar"><div class="skill-bar-fill ops" style="width:75%"></div></div>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">JWT 认证</span>
+        <div class="skill-bar"><div class="skill-bar-fill ops" style="width:85%"></div></div>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">CI/CD</span>
+        <div class="skill-bar"><div class="skill-bar-fill ops" style="width:70%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section class="section" id="contact">
+  <div class="section-header reveal">
+    <span class="section-badge">联系方式</span>
+    <h2 class="section-title">与我联系</h2>
+    <p class="section-desc">欢迎交流后端开发与 AI 应用相关话题</p>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-card reveal">
+      <div class="contact-icon">📧</div>
+      <h3>邮箱</h3>
+      <p><a href="mailto:ly66st@163.com">ly66st@163.com</a></p>
+    </div>
+    <div class="contact-card reveal">
+      <div class="contact-icon">📱</div>
+      <h3>电话</h3>
+      <p>15835586001</p>
+    </div>
+    <div class="contact-card reveal">
+      <div class="contact-icon">📍</div>
+      <h3>位置</h3>
+      <p>湖北省荆州市</p>
+    </div>
+    <div class="contact-card reveal">
+      <div class="contact-icon">🎓</div>
+      <h3>教育</h3>
+      <p>长江大学 · 软件工程</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>© 2026 张雯炫 · 后端 & AI 应用开发作品集</p>
+</footer>
+
+<!-- Back to Top -->
+<button class="back-to-top" id="backToTop">↑</button>
+
+<script>
+// ===== Scroll Progress =====
+const scrollProgress = document.getElementById('scrollProgress');
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = (scrollTop / docHeight) * 100;
+  scrollProgress.style.width = progress + '%';
+});
+
+// ===== Navigation Scroll Effect =====
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// ===== Active Nav Link =====
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop;
+    if (window.scrollY >= sectionTop - 200) {
+      current = section.getAttribute('id');
+    }
+  });
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) {
+      link.classList.add('active');
+    }
+  });
+});
+
+// ===== Counter Animation =====
+function animateCounters() {
+  const counters = document.querySelectorAll('.stat-number[data-target]');
+  counters.forEach(counter => {
+    const target = parseInt(counter.getAttribute('data-target'));
+    const duration = 2000;
+    const start = 0;
+    const increment = target / (duration / 16);
+    let current = start;
+
+    const updateCounter = () => {
+      current += increment;
+      if (current < target) {
+        counter.textContent = Math.floor(current);
+        requestAnimationFrame(updateCounter);
+      } else {
+        counter.textContent = target;
+      }
+    };
+    updateCounter();
+  });
+}
+
+// ===== Particles =====
+function createParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 30; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.animationDelay = Math.random() * 15 + 's';
+    particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+    container.appendChild(particle);
+  }
+}
+
+// ===== Reveal Animation =====
+const observerOptions = {
+  threshold: 0.1,
+  rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, observerOptions);
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ===== Back to Top =====
+const backToTop = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+  backToTop.classList.toggle('visible', window.scrollY > 500);
+});
+backToTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ===== Init =====
+document.addEventListener('DOMContentLoaded', () => {
+  createParticles();
+  setTimeout(animateCounters, 500);
+});
+</script>
+</body>
+</html>

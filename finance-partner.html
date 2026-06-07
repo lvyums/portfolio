@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财搭子 — 多智能体协作理财系统</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+/* ===== CSS Variables ===== */
+:root {
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-hero: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 50%, #A78BFA 100%);
+  --text: #1E293B;
+  --text-dim: #64748B;
+  --border: #E2E8F0;
+  --primary: #7C3AED;
+  --primary-light: #8B5CF6;
+  --accent: #F59E0B;
+  --accent-light: #FBBF24;
+  --success: #10B981;
+  --info: #3B82F6;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+  --radius: 12px;
+  --radius-lg: 20px;
+}
+
+/* ===== Reset ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ===== Navigation ===== */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  background: rgba(248,250,252,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+}
+.nav-back {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav-back:hover { color: var(--primary); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; position: relative; }
+.nav-links a:hover { color: var(--primary); }
+.nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: var(--primary); transition: width 0.3s; }
+.nav-links a:hover::after { width: 100%; }
+
+/* ===== Hero ===== */
+.hero {
+  min-height: 60vh;
+  background: var(--bg-hero);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 120px 40px 80px;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+}
+.hero-badge {
+  display: inline-block;
+  padding: 8px 20px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 50px;
+  color: rgba(255,255,255,0.9);
+  font-size: 0.85rem;
+  margin-bottom: 24px;
+}
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 16px;
+}
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 32px;
+}
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+}
+.stat-item { text-align: center; }
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  display: block;
+}
+.stat-label {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+}
+
+/* ===== Section Common ===== */
+.section {
+  padding: 80px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.section-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.section-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(124,58,237,0.1);
+  color: var(--primary);
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.section-desc {
+  font-size: 1rem;
+  color: var(--text-dim);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ===== Mermaid Container ===== */
+.mermaid-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  margin-bottom: 48px;
+  overflow-x: auto;
+}
+.mermaid {
+  display: flex;
+  justify-content: center;
+}
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ===== Agent Cards ===== */
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.agent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  text-align: center;
+  transition: all 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+.agent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+.agent-card.saver::before { background: linear-gradient(90deg, #10B981, #34D399); }
+.agent-card.saver-icon { background: rgba(16,185,129,0.1); color: #10B981; }
+.agent-card.saver:hover { border-color: #10B981; }
+
+.agent-card.goal::before { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+.agent-card.goal-icon { background: rgba(59,130,246,0.1); color: #3B82F6; }
+.agent-card.goal:hover { border-color: #3B82F6; }
+
+.agent-card.investor::before { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+.agent-card.investor-icon { background: rgba(245,158,11,0.1); color: #F59E0B; }
+.agent-card.investor:hover { border-color: #F59E0B; }
+
+.agent-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+.agent-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 20px;
+}
+.agent-card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.agent-card p {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+.agent-features {
+  list-style: none;
+  text-align: left;
+}
+.agent-features li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agent-features li:last-child { border-bottom: none; }
+.agent-features li::before {
+  content: '✓';
+  color: var(--success);
+  font-weight: 700;
+}
+
+/* ===== Features Grid ===== */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  transition: all 0.3s;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+.feature-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  background: rgba(124,58,237,0.1);
+  color: var(--primary);
+}
+.feature-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.feature-card p {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
+/* ===== Prompt Example ===== */
+.prompt-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius);
+  padding: 24px;
+  overflow-x: auto;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  margin: 24px 0;
+  position: relative;
+}
+.prompt-block::before {
+  content: 'System Prompt';
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 0.75rem;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.prompt-block .role { color: #C084FC; }
+.prompt-block .constraint { color: #86EFAC; }
+.prompt-block .example { color: #60A5FA; }
+
+/* ===== Metrics Grid ===== */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+}
+.metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.metric-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.metric-label {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+/* ===== Challenges Accordion ===== */
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.accordion-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.accordion-header {
+  padding: 20px 24px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+.accordion-header:hover {
+  background: rgba(124,58,237,0.03);
+}
+.accordion-header .icon {
+  transition: transform 0.3s;
+}
+.accordion-item.active .accordion-header .icon {
+  transform: rotate(180deg);
+}
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.accordion-content-inner {
+  padding: 0 24px 20px;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+.accordion-content-inner code {
+  background: rgba(124,58,237,0.1);
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+/* ===== Tech Stack ===== */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+.tech-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s;
+}
+.tech-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+.tech-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  background: rgba(124,58,237,0.1);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.tech-card h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.tech-card p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+/* ===== Footer ===== */
+.footer {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ===== Back to Top ===== */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(124,58,237,0.3);
+  border: none;
+  z-index: 99;
+}
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ===== Reveal Animation ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .nav { padding: 12px 20px; }
+  .nav-links { display: none; }
+  .hero { padding: 100px 20px 60px; }
+  .hero h1 { font-size: 2rem; }
+  .hero-stats { gap: 24px; }
+  .stat-number { font-size: 2rem; }
+  .section { padding: 60px 20px; }
+  .section-title { font-size: 1.5rem; }
+  .agents-grid { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .mermaid-container { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav" id="nav">
+    <a href="./index.html" class="nav-logo" style="text-decoration:none;">← 返回作品集</a>
+  <ul class="nav-links">
+    <li><a href="#architecture">架构</a></li>
+    <li><a href="#agents">智能体</a></li>
+    <li><a href="#features">功能</a></li>
+    <li><a href="#tech">技术栈</a></li>
+    <li><a href="#metrics">数据</a></li>
+  </ul>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">多智能体 · Coze 平台</div>
+    <h1>财搭子</h1>
+    <p class="hero-subtitle">
+      基于 Coze 平台的多智能体协作理财系统，三智能体分工提供个性化理财服务
+    </p>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-number" data-target="3">0</span>
+        <span class="stat-label">智能体</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="1">0</span>
+        <span class="stat-label">小程序</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="100">0</span>
+        <span class="stat-label">用户</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture Section -->
+<section class="section" id="architecture">
+  <div class="section-header reveal">
+    <span class="section-badge">架构设计</span>
+    <h2 class="section-title">多智能体架构</h2>
+    <p class="section-desc">三智能体协作，覆盖理财全流程</p>
+  </div>
+  <div class="mermaid-container reveal">
+    <pre class="mermaid">
+graph TB
+    User[用户] -->|微信小程序| MiniProgram[小程序前端]
+    MiniProgram -->|API调用| Gateway[Coze网关]
+    Gateway --> Router[意图路由器]
+    Router --> SaverAgent[省钱管家]
+    Router --> GoalAgent[攒钱搭子]
+    Router --> InvestorAgent[投资导师]
+
+    SaverAgent --> S1[记账分析]
+    SaverAgent --> S2[消费统计]
+    SaverAgent --> S3[省钱建议]
+
+    GoalAgent --> G1[目标设定]
+    GoalAgent --> G2[进度追踪]
+    GoalAgent --> G3[激励提醒]
+
+    InvestorAgent --> I1[理财科普]
+    InvestorAgent --> I2[风险评估]
+    InvestorAgent --> I3[防坑提醒]
+
+    S1 --> DB[(数据库)]
+    G1 --> DB
+    I1 --> KB[(知识库)]
+
+    SaverAgent --> Output[结果聚合]
+    GoalAgent --> Output
+    InvestorAgent --> Output
+    Output --> MiniProgram
+
+    style User fill:#E8F5E9,stroke:#4CAF50
+    style MiniProgram fill:#E8F5E9,stroke:#4CAF50
+    style Gateway fill:#E3F2FD,stroke:#2196F3
+    style Router fill:#E3F2FD,stroke:#2196F3
+    style SaverAgent fill:#C8E6C9,stroke:#4CAF50
+    style GoalAgent fill:#BBDEFB,stroke:#2196F3
+    style InvestorAgent fill:#FFE0B2,stroke:#FF9800
+    style DB fill:#FFF3E0,stroke:#FF9800
+    style KB fill:#FFF3E0,stroke:#FF9800
+    style Output fill:#F3E5F5,stroke:#9C27B0
+    </pre>
+  </div>
+</section>
+
+<!-- Workflow Section -->
+<section class="section">
+  <div class="section-header reveal">
+    <span class="section-badge">工作流</span>
+    <h2 class="section-title">工作流编排</h2>
+    <p class="section-desc">用户提问 → 智能体匹配 → 结果生成</p>
+  </div>
+  <div class="mermaid-container reveal">
+    <pre class="mermaid">
+graph LR
+    A[用户提问] --> B{意图识别}
+    B -->|消费类| C[省钱管家]
+    B -->|攒钱类| D[攒钱搭子]
+    B -->|投资类| E[投资导师]
+
+    C --> F[执行工具]
+    D --> F
+    E --> F
+
+    F --> G[生成回复]
+    G --> H[格式化输出]
+    H --> I[返回用户]
+
+    style A fill:#E8F5E9,stroke:#4CAF50
+    style B fill:#E3F2FD,stroke:#2196F3
+    style C fill:#C8E6C9,stroke:#4CAF50
+    style D fill:#BBDEFB,stroke:#2196F3
+    style E fill:#FFE0B2,stroke:#FF9800
+    style I fill:#F3E5F5,stroke:#9C27B0
+    </pre>
+  </div>
+</section>
+
+<!-- Agents Section -->
+<section class="section" id="agents">
+  <div class="section-header reveal">
+    <span class="section-badge">智能体</span>
+    <h2 class="section-title">三大智能体</h2>
+    <p class="section-desc">分工明确，各司其职</p>
+  </div>
+  <div class="agents-grid">
+    <div class="agent-card saver reveal">
+      <div class="agent-icon saver-icon">💰</div>
+      <h3>省钱管家</h3>
+      <p>记账分析与消费统计专家</p>
+      <ul class="agent-features">
+        <li>消费记录自动分类</li>
+        <li>月度消费趋势分析</li>
+        <li>异常消费预警提醒</li>
+        <li>省钱建议与技巧</li>
+      </ul>
+    </div>
+    <div class="agent-card goal reveal">
+      <div class="agent-icon goal-icon">🎯</div>
+      <h3>攒钱搭子</h3>
+      <p>目标分解与进度追踪助手</p>
+      <ul class="agent-features">
+        <li>攒钱目标设定与分解</li>
+        <li>进度可视化追踪</li>
+        <li>里程碑激励提醒</li>
+        <li>调整建议与优化</li>
+      </ul>
+    </div>
+    <div class="agent-card investor reveal">
+      <div class="agent-icon investor-icon">📈</div>
+      <h3>投资导师</h3>
+      <p>理财科普与风险评估顾问</p>
+      <ul class="agent-features">
+        <li>理财知识科普</li>
+        <li>投资产品解读</li>
+        <li>风险等级评估</li>
+        <li>防坑提醒与警示</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="section" id="features">
+  <div class="section-header reveal">
+    <span class="section-badge">核心功能</span>
+    <h2 class="section-title">功能特性</h2>
+    <p class="section-desc">覆盖理财场景的核心能力</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon">📊</div>
+      <h3>智能记账分析</h3>
+      <p>自动分类消费记录，生成月度消费报告，识别异常消费模式，提供个性化省钱建议。</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🎯</div>
+      <h3>攒钱目标管理</h3>
+      <p>设定攒钱目标并自动分解为阶段性里程碑，实时追踪进度，达成里程碑时自动激励。</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">📚</div>
+      <h3>理财知识科普</h3>
+      <p>针对大学生群体设计的理财科普内容，涵盖基金、股票、储蓄等基础知识，避免专业术语。</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">⚠️</div>
+      <h3>风险预警提醒</h3>
+      <p>识别潜在的金融风险产品，提供防坑提醒，帮助用户避开高风险投资陷阱。</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">💬</div>
+      <h3>自然语言交互</h3>
+      <p>支持自然语言对话，用户可以用日常语言描述需求，智能体自动理解并执行。</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">📱</div>
+      <h3>小程序接入</h3>
+      <p>通过微信小程序提供服务，无需下载 APP，扫码即用，降低使用门槛。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Prompt Design Section -->
+<section class="section">
+  <div class="section-header reveal">
+    <span class="section-badge">Prompt 设计</span>
+    <h2 class="section-title">约束性提示词</h2>
+    <p class="section-desc">确保输出内容的专业性、准确性与安全性</p>
+  </div>
+  <div class="prompt-block reveal">
+    <span class="role">角色定义：</span>你是一位专业的理财顾问，专注于为大学生提供理财建议。<br><br>
+    <span class="constraint">约束条件：</span><br>
+    - 仅提供建议，不提供具体投资推荐<br>
+    - 避免使用专业术语，用通俗易懂的语言<br>
+    - 强调风险意识，不鼓励高风险投资<br>
+    - 涉及具体产品时，必须提醒用户自行核实<br><br>
+    <span class="example">输出格式：</span><br>
+    - 核心建议 → 详细解释 → 风险提示 → 行动建议
+  </div>
+</section>
+
+<!-- Metrics Section -->
+<section class="section" id="metrics">
+  <div class="section-header reveal">
+    <span class="section-badge">项目数据</span>
+    <h2 class="section-title">核心指标</h2>
+    <p class="section-desc">项目关键数据一览</p>
+  </div>
+  <div class="metrics-grid">
+    <div class="metric-card reveal">
+      <div class="metric-value" data-target="3">0</div>
+      <div class="metric-label">智能体数量</div>
+    </div>
+    <div class="metric-card reveal">
+      <div class="metric-value" data-target="1">0</div>
+      <div class="metric-label">接入平台</div>
+    </div>
+    <div class="metric-card reveal">
+      <div class="metric-value" data-target="100">0</div>
+      <div class="metric-label">用户数</div>
+    </div>
+    <div class="metric-card reveal">
+      <div class="metric-value">7×24</div>
+      <div class="metric-label">服务时间</div>
+    </div>
+  </div>
+</section>
+
+<!-- Challenges Section -->
+<section class="section">
+  <div class="section-header reveal">
+    <span class="section-badge">技术挑战</span>
+    <h2 class="section-title">挑战与解决方案</h2>
+    <p class="section-desc">开发过程中遇到的关键问题</p>
+  </div>
+  <div class="accordion">
+    <div class="accordion-item reveal">
+      <div class="accordion-header">
+        <span>智能体意图识别准确性</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-content-inner">
+          <p><strong>问题：</strong>用户输入多样化，同一意图可能有多种表达方式，导致智能体匹配错误。</p>
+          <p><strong>方案：</strong>设计意图分类体系，结合关键词匹配和 LLM 语义理解双重机制。建立意图词典，持续优化匹配准确率。</p>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item reveal">
+      <div class="accordion-header">
+        <span>理财建议的安全性</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-content-inner">
+          <p><strong>问题：</strong>理财建议涉及用户资金安全，错误建议可能导致经济损失。</p>
+          <p><strong>方案：</strong>设计约束性 Prompt，明确禁止提供具体投资推荐。增加风险提示模块，所有建议必须附带风险说明。建立内容审核机制，过滤高风险建议。</p>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item reveal">
+      <div class="accordion-header">
+        <span>多智能体协作一致性</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-content-inner">
+          <p><strong>问题：</strong>三个智能体可能给出相互矛盾的建议，影响用户体验。</p>
+          <p><strong>方案：</strong>设计统一的知识库和价值观约束，确保三个智能体基于相同的原则提供建议。增加结果聚合层，检测并解决潜在冲突。</p>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item reveal">
+      <div class="accordion-header">
+        <span>小程序与 Coze API 对接</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-content-inner">
+          <p><strong>问题：</strong>微信小程序与 Coze API 的对接存在跨域、认证、消息格式等技术障碍。</p>
+          <p><strong>方案：</strong>通过后端服务代理 API 请求，解决跨域问题。设计统一的消息格式转换层，适配小程序和 Coze 的消息协议。实现 Token 管理机制，确保 API 调用的稳定性。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack Section -->
+<section class="section" id="tech">
+  <div class="section-header reveal">
+    <span class="section-badge">技术栈</span>
+    <h2 class="section-title">技术选型</h2>
+    <p class="section-desc">项目使用的核心技术</p>
+  </div>
+  <div class="tech-grid">
+    <div class="tech-card reveal">
+      <div class="tech-card-icon">🤖</div>
+      <div>
+        <h4>Coze 平台</h4>
+        <p>多智能体开发平台，提供工作流编排、知识库管理等能力</p>
+      </div>
+    </div>
+    <div class="tech-card reveal">
+      <div class="tech-card-icon">💬</div>
+      <div>
+        <h4>LLM API</h4>
+        <p>大语言模型 API，提供自然语言理解和生成能力</p>
+      </div>
+    </div>
+    <div class="tech-card reveal">
+      <div class="tech-card-icon">📱</div>
+      <div>
+        <h4>微信小程序</h4>
+        <p>前端交互界面，提供用户友好的对话体验</p>
+      </div>
+    </div>
+    <div class="tech-card reveal">
+      <div class="tech-card-icon">⚙️</div>
+      <div>
+        <h4>工作流编排</h4>
+        <p>Coze 工作流引擎，实现智能体任务分发与协作</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>© 2026 张雯炫 · 财搭子多智能体协作理财系统</p>
+  <p style="margin-top: 8px;"><a href="../index.html" style="color: var(--primary); text-decoration: none;">← 返回后端 & AI 作品集</a></p>
+</footer>
+
+<!-- Back to Top -->
+<button class="back-to-top" id="backToTop">↑</button>
+
+<script>
+// ===== Mermaid Init =====
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'default',
+  securityLevel: 'loose',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif',
+  flowchart: {
+    useMaxWidth: true,
+    htmlLabels: true,
+    curve: 'basis'
+  }
+});
+
+// ===== Counter Animation =====
+function animateCounters() {
+  const counters = document.querySelectorAll('.stat-number[data-target], .metric-value[data-target]');
+  counters.forEach(counter => {
+    const target = parseInt(counter.getAttribute('data-target'));
+    const duration = 2000;
+    const increment = target / (duration / 16);
+    let current = 0;
+
+    const updateCounter = () => {
+      current += increment;
+      if (current < target) {
+        counter.textContent = Math.floor(current);
+        requestAnimationFrame(updateCounter);
+      } else {
+        counter.textContent = target;
+      }
+    };
+    updateCounter();
+  });
+}
+
+// ===== Accordion =====
+document.querySelectorAll('.accordion-header').forEach(header => {
+  header.addEventListener('click', () => {
+    const item = header.parentElement;
+    const content = item.querySelector('.accordion-content');
+    const isActive = item.classList.contains('active');
+
+    // Close all
+    document.querySelectorAll('.accordion-item').forEach(i => {
+      i.classList.remove('active');
+      i.querySelector('.accordion-content').style.maxHeight = '0';
+    });
+
+    // Open clicked
+    if (!isActive) {
+      item.classList.add('active');
+      content.style.maxHeight = content.scrollHeight + 'px';
+    }
+  });
+});
+
+// ===== Reveal Animation =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ===== Back to Top =====
+const backToTop = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+  backToTop.classList.toggle('visible', window.scrollY > 500);
+});
+backToTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ===== Init =====
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(animateCounters, 500);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能选课系统 — AI Agent 驱动的全栈作品集</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root {
+    --primary: #7c3aed;
+    --primary-light: #8b5cf6;
+    --primary-dark: #6d28d9;
+    --primary-bg: rgba(124, 58, 237, 0.06);
+    --accent: #0891b2;
+    --accent-light: #06b6d4;
+    --accent-bg: rgba(8, 145, 178, 0.06);
+    --emerald: #059669;
+    --emerald-bg: rgba(5, 150, 105, 0.06);
+    --amber: #d97706;
+    --amber-bg: rgba(217, 119, 6, 0.06);
+    --rose: #e11d48;
+    --rose-bg: rgba(225, 29, 72, 0.06);
+    --bg: #FAFAFE;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F5F3FF;
+    --border: #E9E5F5;
+    --border-light: #F0EDFA;
+    --text: #1E1B3A;
+    --text-dim: #64608B;
+    --text-muted: #9894B8;
+    --gradient-1: linear-gradient(135deg, #7c3aed 0%, #0891b2 100%);
+    --gradient-2: linear-gradient(135deg, #e11d48 0%, #d97706 100%);
+    --gradient-3: linear-gradient(135deg, #059669 0%, #0891b2 100%);
+    --shadow: 0 2px 8px rgba(30, 27, 58, 0.06), 0 1px 3px rgba(30, 27, 58, 0.04);
+    --shadow-lg: 0 8px 24px rgba(30, 27, 58, 0.1), 0 2px 8px rgba(30, 27, 58, 0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden;
+}
+
+/* NAV */
+.nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(20px); background: rgba(250, 250, 254, 0.85);
+    border-bottom: 1px solid transparent; transition: all 0.3s;
+}
+.nav.scrolled { padding: 0.6rem 2rem; background: rgba(250, 250, 254, 0.95); border-bottom-color: var(--border); box-shadow: var(--shadow); }
+.nav-logo { font-size: 1.25rem; font-weight: 700; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+.nav-links a:hover { color: var(--primary); }
+
+/* HERO */
+.hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2rem; position: relative; overflow: hidden; }
+.hero::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(124, 58, 237, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(8, 145, 178, 0.05) 0%, transparent 50%);
+    animation: heroGlow 8s ease-in-out infinite alternate;
+}
+@keyframes heroGlow { 0% { transform: translate(0, 0); } 100% { transform: translate(-5%, 5%); } }
+.hero-content { position: relative; z-index: 1; max-width: 800px; }
+.hero-badge {
+    display: inline-block; padding: 0.5rem 1.5rem;
+    background: var(--primary-bg); border: 1px solid rgba(124, 58, 237, 0.15);
+    border-radius: 50px; color: var(--primary); font-size: 0.85rem; margin-bottom: 2rem;
+    animation: fadeInUp 0.8s ease;
+}
+.hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; animation: fadeInUp 0.8s ease 0.2s both; }
+.hero h1 .gradient-text { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero p { font-size: 1.25rem; color: var(--text-dim); margin-bottom: 3rem; animation: fadeInUp 0.8s ease 0.4s both; }
+.hero-stats { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; animation: fadeInUp 0.8s ease 0.6s both; }
+.stat-item { text-align: center; }
+.stat-number { font-size: 2.5rem; font-weight: 800; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+/* SECTIONS */
+.section { padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; }
+.section-header { text-align: center; margin-bottom: 4rem; }
+.section-tag {
+    display: inline-block; padding: 0.4rem 1rem;
+    background: var(--primary-bg); border: 1px solid rgba(124, 58, 237, 0.15);
+    border-radius: 50px; color: var(--primary); font-size: 0.8rem;
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem;
+}
+.section-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+.section-desc { color: var(--text-dim); max-width: 600px; margin: 0 auto; }
+
+/* MERMAID */
+.mermaid-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+}
+.mermaid { display: flex; justify-content: center; }
+.mermaid svg { max-width: 100%; height: auto; }
+
+/* AGENT ARCHITECTURE */
+.agent-arch { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; }
+.agent-flow { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.agent-step {
+    background: var(--primary-bg); border: 1px solid rgba(124, 58, 237, 0.12);
+    border-radius: 12px; padding: 1rem 1.5rem; text-align: center; min-width: 140px;
+    transition: all 0.3s;
+}
+.agent-step:hover { transform: translateY(-2px); border-color: var(--primary); box-shadow: var(--shadow); }
+.agent-step-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.agent-step-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem; }
+.agent-step-desc { color: var(--text-dim); font-size: 0.75rem; }
+.agent-arrow { color: var(--primary); font-size: 1.5rem; }
+
+/* TOOLS GRID */
+.tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem; }
+.tool-card { background: #F8F6FF; border: 1px solid var(--border); border-radius: 10px; padding: 1rem; transition: all 0.3s; }
+.tool-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
+.tool-name { font-family: monospace; color: var(--accent); font-size: 0.85rem; margin-bottom: 0.5rem; }
+.tool-desc { color: var(--text-dim); font-size: 0.8rem; }
+
+/* FALLBACK CHAIN */
+.fallback-chain { display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 2rem; }
+.fallback-level { background: var(--bg-card-hover); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; text-align: center; min-width: 180px; }
+.fallback-level.active { border-color: var(--emerald); background: var(--emerald-bg); }
+.fallback-level .level-num { color: var(--primary); font-size: 0.75rem; font-weight: 600; }
+.fallback-level .level-name { font-weight: 600; font-size: 0.85rem; margin: 0.25rem 0; }
+.fallback-level .level-desc { color: var(--text-dim); font-size: 0.75rem; }
+.fallback-arrow { color: var(--text-muted); font-size: 1.2rem; }
+
+/* PATTERNS GRID */
+.patterns-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.pattern-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.5rem; transition: all 0.3s;
+    position: relative; overflow: hidden;
+}
+.pattern-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; transform: scaleX(0); transition: transform 0.3s; }
+.pattern-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: var(--shadow-lg); }
+.pattern-card:hover::before { transform: scaleX(1); }
+.pattern-card.creational::before { background: var(--gradient-1); }
+.pattern-card.structural::before { background: var(--gradient-3); }
+.pattern-card.behavioral::before { background: var(--gradient-2); }
+.pattern-type { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 600; margin-bottom: 0.75rem; }
+.pattern-type.creational { background: var(--primary-bg); color: var(--primary); }
+.pattern-type.structural { background: var(--emerald-bg); color: var(--emerald); }
+.pattern-type.behavioral { background: var(--rose-bg); color: var(--rose); }
+.pattern-card h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+.pattern-card p { color: var(--text-dim); font-size: 0.85rem; }
+.pattern-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+
+/* FEATURES */
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
+.feature-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; transition: all 0.3s; }
+.feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+.feature-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+.feature-number { width: 40px; height: 40px; border-radius: 10px; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; color: #fff; }
+.feature-card h3 { font-size: 1.15rem; }
+.feature-card p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1.5rem; }
+.code-block {
+    background: #F8F6FF; border: 1px solid var(--border); border-radius: 10px;
+    padding: 1rem 1.25rem; font-family: 'Courier New', monospace;
+    font-size: 0.8rem; line-height: 1.5; overflow-x: auto; color: var(--text-dim);
+}
+.code-block .kw { color: #7C3AED; }
+.code-block .str { color: #059669; }
+.code-block .cmt { color: var(--text-muted); }
+.code-block .tp { color: #0891b2; }
+.code-block .ann { color: #d97706; }
+
+/* CHAT DEMO */
+.chat-demo { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; max-width: 600px; margin: 0 auto; }
+.chat-messages { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+.chat-msg { max-width: 80%; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.9rem; }
+.chat-msg.user { align-self: flex-end; background: var(--gradient-1); color: white; border-bottom-right-radius: 4px; }
+.chat-msg.bot { align-self: flex-start; background: #F5F3FF; color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border); }
+.chat-msg .tool-tag { display: inline-block; padding: 0.1rem 0.4rem; background: var(--accent-bg); border-radius: 4px; color: var(--accent); font-size: 0.7rem; font-family: monospace; margin-bottom: 0.25rem; }
+.chat-input { display: flex; gap: 0.75rem; padding: 0.75rem; background: #F8F6FF; border: 1px solid var(--border); border-radius: 12px; }
+.chat-input input { flex: 1; background: none; border: none; color: var(--text); font-size: 0.9rem; outline: none; }
+.chat-input input::placeholder { color: var(--text-muted); }
+.chat-send-btn { padding: 0.5rem 1rem; background: var(--gradient-1); border: none; border-radius: 8px; color: white; font-size: 0.85rem; cursor: pointer; transition: opacity 0.3s; }
+.chat-send-btn:hover { opacity: 0.85; }
+
+/* DB TABLES */
+.db-tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+.db-table { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.3s; }
+.db-table:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.db-table-header { background: var(--primary-bg); padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.75rem; }
+.db-table-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.db-table-header h4 { font-size: 0.95rem; }
+.db-table-body { padding: 1rem 1.25rem; }
+.db-field { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; font-size: 0.85rem; border-bottom: 1px solid var(--border-light); }
+.db-field:last-child { border-bottom: none; }
+.db-field-name { color: var(--text); font-family: monospace; }
+.db-field-type { color: var(--text-muted); font-size: 0.75rem; }
+.db-field.special { background: rgba(124, 58, 237, 0.03); margin: 0 -1.25rem; padding: 0.4rem 1.25rem; }
+
+/* ACCORDION */
+.accordion { display: flex; flex-direction: column; gap: 1rem; }
+.accordion-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.3s; }
+.accordion-item.active { border-color: var(--primary); }
+.accordion-header { padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: background 0.3s; }
+.accordion-header:hover { background: var(--bg-card-hover); }
+.accordion-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--primary-bg); display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: 700; flex-shrink: 0; }
+.accordion-header h3 { font-size: 1rem; flex: 1; }
+.accordion-arrow { color: var(--text-muted); transition: transform 0.3s; font-size: 1.2rem; }
+.accordion-item.active .accordion-arrow { transform: rotate(180deg); }
+.accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.accordion-body-inner { padding: 0 1.5rem 1.5rem; }
+.accordion-body p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1rem; }
+.accordion-body .label { display: inline-block; padding: 0.2rem 0.6rem; background: var(--primary-bg); border-radius: 4px; color: var(--primary); font-size: 0.75rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+/* METRICS */
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+.metric-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.3s; }
+.metric-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+.metric-value { font-size: 2.5rem; font-weight: 800; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.metric-label { color: var(--text-dim); font-size: 0.85rem; margin-top: 0.5rem; }
+
+/* COURSE TABLE */
+.course-demo { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.course-table { width: 100%; border-collapse: collapse; }
+.course-table th { background: var(--primary-bg); padding: 1rem; text-align: left; font-size: 0.85rem; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+.course-table td { padding: 1rem; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
+.course-table tr:last-child td { border-bottom: none; }
+.course-table tr:hover { background: rgba(124, 58, 237, 0.03); }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
+.badge-purple { background: var(--primary-bg); color: var(--primary); }
+.badge-cyan { background: var(--accent-bg); color: var(--accent); }
+.badge-green { background: var(--emerald-bg); color: var(--emerald); }
+
+/* FOOTER */
+.footer { padding: 3rem 2rem; text-align: center; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
+.footer-links { display: flex; justify-content: center; gap: 2rem; margin-bottom: 1.5rem; }
+.footer-links a { color: var(--text-dim); text-decoration: none; transition: color 0.3s; }
+.footer-links a:hover { color: var(--primary); }
+
+/* REVEAL */
+.reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-left { opacity: 0; transform: translateX(-40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal-left.visible { opacity: 1; transform: translateX(0); }
+.reveal-right { opacity: 0; transform: translateX(40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal-right.visible { opacity: 1; transform: translateX(0); }
+.stagger > * { opacity: 0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); transition-delay: calc(var(--i, 0) * 0.1s); }
+.stagger.visible > * { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hero-stats { gap: 1.5rem; }
+    .section { padding: 4rem 1.5rem; }
+    .section-title { font-size: 2rem; }
+    .patterns-grid { grid-template-columns: repeat(2, 1fr); }
+    .features-grid { grid-template-columns: 1fr; }
+    .tools-grid { grid-template-columns: repeat(2, 1fr); }
+    .agent-flow { flex-direction: column; }
+    .agent-arrow { transform: rotate(90deg); }
+}
+@media (max-width: 480px) {
+    .hero h1 { font-size: 2rem; }
+    .patterns-grid { grid-template-columns: 1fr; }
+    .tools-grid { grid-template-columns: 1fr; }
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+    <a href="./index.html" class="nav-logo" style="text-decoration:none;">← 返回作品集</a>
+    <ul class="nav-links">
+        <li><a href="https://github.com/lvyums/SelectClass-AI-agent" target="_blank" style="color:var(--primary);font-weight:600;">GitHub</a></li>
+        <li><a href="#agent">AI Agent</a></li>
+        <li><a href="#patterns">设计模式</a></li>
+        <li><a href="#features">技术亮点</a></li>
+        <li><a href="#database">数据库</a></li>
+        <li><a href="#challenges">挑战</a></li>
+        <li><a href="#metrics">数据</a></li>
+    </ul>
+</nav>
+
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-badge">AI Agent 驱动 · 自然语言选课 · 6 种工具能力</span>
+        <h1><span class="gradient-text">智能选课</span>系统</h1>
+        <p>基于 AI Agent 架构的智能选课平台，支持自然语言对话完成选课、退课、查询、推荐等操作</p>
+        <div class="hero-stats">
+            <div class="stat-item"><div class="stat-number" data-count="6">0</div><div class="stat-label">Agent 工具</div></div>
+            <div class="stat-item"><div class="stat-number" data-count="9">0</div><div class="stat-label">设计模式</div></div>
+            <div class="stat-item"><div class="stat-number" data-count="3">0</div><div class="stat-label">降级层级</div></div>
+            <div class="stat-item"><div class="stat-number" data-count="36">0</div><div class="stat-label">课程数据</div></div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="agent">
+    <div class="section-header reveal">
+        <span class="section-tag">AI Agent</span>
+        <h2 class="section-title">Agent 架构设计</h2>
+        <p class="section-desc">自然语言理解 + 工具调用 + 智能降级，覆盖选课全流程</p>
+    </div>
+
+    <!-- Mermaid Agent Flow -->
+    <div class="mermaid-container reveal">
+        <pre class="mermaid">
+graph LR
+    User[用户消息] -->|帮我选CS101| Intent[意图识别]
+    Intent -->|LLM分析| ToolSelect[工具选择]
+    ToolSelect -->|search_courses| Execute[执行工具]
+    Execute -->|查询DB| Result[生成回复]
+    Result -->|已添加CS101| User
+
+    style User fill:#E8F5E9,stroke:#4CAF50
+    style Intent fill:#E3F2FD,stroke:#2196F3
+    style ToolSelect fill:#E3F2FD,stroke:#2196F3
+    style Execute fill:#FFF3E0,stroke:#FF9800
+    style Result fill:#F3E5F5,stroke:#9C27B0
+        </pre>
+    </div>
+
+    <!-- Tools Grid -->
+    <h3 style="text-align: center; margin-bottom: 1rem; color: var(--text-dim);">6 种工具能力</h3>
+    <div class="tools-grid reveal">
+        <div class="tool-card"><div class="tool-name">search_courses</div><div class="tool-desc">按关键词搜索课程，支持课程名、代号、教师、院系</div></div>
+        <div class="tool-card"><div class="tool-name">get_selections</div><div class="tool-desc">查看已选课程列表和学分统计</div></div>
+        <div class="tool-card"><div class="tool-name">add_course</div><div class="tool-desc">将课程加入选课列表，自动检测冲突</div></div>
+        <div class="tool-card"><div class="tool-name">remove_course</div><div class="tool-desc">从选课列表中移除课程</div></div>
+        <div class="tool-card"><div class="tool-name">replace_course</div><div class="tool-desc">将已选课程替换为新课程</div></div>
+        <div class="tool-card"><div class="tool-name">recommend_courses</div><div class="tool-desc">基于专业、兴趣推荐课程</div></div>
+    </div>
+
+    <!-- Mermaid Fallback Chain -->
+    <h3 style="text-align: center; margin: 2rem 0 1rem; color: var(--text-dim);">三级降级策略</h3>
+    <div class="mermaid-container reveal">
+        <pre class="mermaid">
+graph LR
+    L1[Level 1<br/>LLM工具调用] -->|失败| L2[Level 2<br/>LLM直接回复]
+    L2 -->|失败| L3[Level 3<br/>规则引擎]
+
+    style L1 fill:#C8E6C9,stroke:#4CAF50
+    style L2 fill:#BBDEFB,stroke:#2196F3
+    style L3 fill:#FFE0B2,stroke:#FF9800
+        </pre>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header reveal">
+        <span class="section-tag">Demo</span>
+        <h2 class="section-title">对话式选课</h2>
+        <p class="section-desc">Agent 自动识别意图，调用对应工具完成操作</p>
+    </div>
+    <div class="chat-demo reveal">
+        <div class="chat-messages">
+            <div class="chat-msg user">帮我选 CS101</div>
+            <div class="chat-msg bot"><div class="tool-tag">search_courses → add_course</div><br>找到 1 门课程：CS101 计算机导论（3学分，张教授）<br>已成功添加。</div>
+            <div class="chat-msg user">推荐一些数学课</div>
+            <div class="chat-msg bot"><div class="tool-tag">recommend_courses</div><br>为你推荐以下课程：<br>- MATH201 线性代数（3学分）<br>- MATH301 概率统计（3学分）</div>
+            <div class="chat-msg user">好的</div>
+            <div class="chat-msg bot"><div class="tool-tag">add_course (确认词触发)</div><br>已成功添加 MATH201 线性代数。<br>你当前已选 3 门课程，共 9 学分。</div>
+            <div class="chat-msg user">我选了哪些课</div>
+            <div class="chat-msg bot"><div class="tool-tag">get_selections</div><br>你当前已选 3 门课程，共 9 学分：<br>- CS101 计算机导论（3学分）<br>- MATH201 线性代数（3学分）<br>- ENG101 大学英语（3学分）</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" placeholder="试试：帮我选一门物理课..." disabled>
+            <button class="chat-send-btn">发送</button>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="patterns">
+    <div class="section-header reveal">
+        <span class="section-tag">Design Patterns</span>
+        <h2 class="section-title">9 种设计模式</h2>
+        <p class="section-desc">覆盖创建型、结构型、行为型三大类</p>
+    </div>
+    <div class="patterns-grid stagger">
+        <div class="pattern-card creational" style="--i:0"><div class="pattern-icon">🔷</div><span class="pattern-type creational">创建型</span><h3>单例模式</h3><p>数据库连接、配置、Axios 实例、Agent 实例</p></div>
+        <div class="pattern-card creational" style="--i:1"><div class="pattern-icon">🏭</div><span class="pattern-type creational">创建型</span><h3>工厂模式</h3><p>FastAPI/Vue 应用创建，封装初始化流程</p></div>
+        <div class="pattern-card structural" style="--i:2"><div class="pattern-icon">📐</div><span class="pattern-type structural">结构型</span><h3>MVC 模式</h3><p>前后端分层架构，职责分离</p></div>
+        <div class="pattern-card structural" style="--i:3"><div class="pattern-icon">🗺️</div><span class="pattern-type structural">结构型</span><h3>蓝图模式</h3><p>后端路由模块化，6 个蓝图按业务域拆分</p></div>
+        <div class="pattern-card structural" style="--i:4"><div class="pattern-icon">🛡️</div><span class="pattern-type structural">结构型</span><h3>代理模式</h3><p>@login_required、Axios 拦截器、路由守卫</p></div>
+        <div class="pattern-card structural" style="--i:5"><div class="pattern-icon">🎀</div><span class="pattern-type structural">结构型</span><h3>装饰器模式</h3><p>@log_request 日志装饰器</p></div>
+        <div class="pattern-card behavioral" style="--i:6"><div class="pattern-icon">👁️</div><span class="pattern-type behavioral">行为型</span><h3>观察者模式</h3><p>Pinia 响应式状态管理</p></div>
+        <div class="pattern-card behavioral" style="--i:7"><div class="pattern-icon">♟️</div><span class="pattern-type behavioral">行为型</span><h3>策略模式</h3><p>不同课程类型独立选课策略</p></div>
+        <div class="pattern-card behavioral" style="--i:8"><div class="pattern-icon">📋</div><span class="pattern-type behavioral">行为型</span><h3>模板方法</h3><p>ApiResponse 统一响应格式</p></div>
+    </div>
+</section>
+
+<section class="section" id="features">
+    <div class="section-header reveal">
+        <span class="section-tag">Highlights</span>
+        <h2 class="section-title">技术亮点</h2>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card reveal-left">
+            <div class="feature-header"><div class="feature-number">1</div><h3>Agent 工具调用</h3></div>
+            <p>Agent 拥有 6 种工具能力，根据用户意图自动选择并执行。支持多工具链式调用（搜索→选课）。</p>
+            <div class="code-block">
+<span class="cmt"># Agent 工具调用流程</span>
+<span class="str">"帮我选CS101"</span> → search_courses(<span class="str">"CS101"</span>)
+                → add_course(course_id=<span class="str">1</span>)
+                → <span class="str">"已成功添加 CS101"</span>
+
+<span class="cmt"># 工具注册表</span>
+TOOL_MAP = {
+    <span class="str">"search_courses"</span>: _exec_search_courses,
+    <span class="str">"add_course"</span>: _exec_add_course,
+    <span class="str">"remove_course"</span>: _exec_remove_course,
+    ...
+}</div>
+        </div>
+        <div class="feature-card reveal-right">
+            <div class="feature-header"><div class="feature-number">2</div><h3>上下文感知</h3></div>
+            <p>Agent 理解用户专业、年级、已选课程等上下文，实现个性化交互。支持确认词快速操作。</p>
+            <div class="code-block">
+<span class="cmt"># 上下文构建</span>
+system_prompt = <span class="str">f"""
+学生：{major} {grade}，兴趣：{interests}
+已选课程：{current_selections}
+"""</span>
+
+<span class="cmt"># 确认词机制</span>
+<span class="kw">if</span> message.strip() <span class="kw">in</span> CONFIRM_WORDS:
+    <span class="cmt"># 用户说"好的" → 自动添加缓存课程</span>
+    _exec_add_course(user.id, cached[<span class="str">0</span>][<span class="str">"id"</span>])</div>
+        </div>
+        <div class="feature-card reveal-left">
+            <div class="feature-header"><div class="feature-number">3</div><h3>三级降级策略</h3></div>
+            <p>LLM 工具调用 → 直接回复 → 规则引擎，确保服务始终可用。</p>
+            <div class="code-block">
+<span class="kw">try</span>:
+    <span class="cmt"># Level 1: LLM 工具调用</span>
+    response = llm.chat_completion(messages, tools=TOOLS)
+    tool_calls = parse_tool_calls(response)
+<span class="kw">except</span> <span class="tp">Exception</span>:
+    <span class="cmt"># Level 3: 规则引擎兜底</span>
+    <span class="kw">return</span> _keyword_fallback(user, message)
+
+<span class="cmt"># 规则引擎支持：</span>
+<span class="cmt"># "帮我选CS101" → 正则提取课程代号</span>
+<span class="cmt"># "退掉数学课" → 模糊匹配已选课程</span></div>
+        </div>
+        <div class="feature-card reveal-right">
+            <div class="feature-header"><div class="feature-number">4</div><h3>策略模式选课</h3></div>
+            <p>不同课程类型采用独立选课策略，新增课程类型只需添加策略类（开闭原则）。</p>
+            <div class="code-block">
+<span class="kw">class</span> <span class="tp">EnrollmentStrategy</span>(ABC):
+    <span class="ann">@abstractmethod</span>
+    <span class="kw">def</span> validate(<span class="kw">self</span>, user, course, existing): ...
+    <span class="ann">@abstractmethod</span>
+    <span class="kw">def</span> execute(<span class="kw">self</span>, user_id, course): ...
+
+_strategies = {
+    <span class="str">"专业课"</span>: MajorCourseStrategy(),
+    <span class="str">"公共课"</span>: GeneralCourseStrategy(),  <span class="cmt"># ≤5门</span>
+}
+_default = ElectiveCourseStrategy()</div>
+        </div>
+        <div class="feature-card reveal-left">
+            <div class="feature-header"><div class="feature-number">5</div><h3>双数据库支持</h3></div>
+            <p>启动时自动探测 MySQL 可用性，不可用时降级到 SQLite，开发/生产无缝切换。</p>
+            <div class="code-block">
+<span class="kw">try</span>:
+    _test_engine = create_engine(_mysql_url)
+    <span class="kw">with</span> _test_engine.connect():
+        <span class="kw">pass</span>
+    DATABASE_URL = _mysql_url
+<span class="kw">except</span> <span class="tp">Exception</span>:
+    DATABASE_URL = <span class="str">f"sqlite:///{_sqlite_path}"</span></div>
+        </div>
+        <div class="feature-card reveal-right">
+            <div class="feature-header"><div class="feature-number">6</div><h3>代理+装饰器组合</h3></div>
+            <p>@login_required（代理）+ @log_request（装饰器）组合，职责清晰。</p>
+            <div class="code-block">
+<span class="ann">@router.get</span>(<span class="str">"/"</span>)
+<span class="ann">@login_required</span>   <span class="cmt"># 代理模式 — 权限校验</span>
+<span class="ann">@log_request</span>      <span class="cmt"># 装饰器模式 — 日志记录</span>
+<span class="kw">def</span> list_selection(current_user=Depends(get_current_user)):
+    <span class="kw">return</span> selection_service.get_user_selections(...)</div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="database">
+    <div class="section-header reveal">
+        <span class="section-tag">Database</span>
+        <h2 class="section-title">数据库设计</h2>
+        <p class="section-desc">4 张核心表，合理的关联关系和约束设计</p>
+    </div>
+    <div class="db-tables stagger">
+        <div class="db-table" style="--i:0">
+            <div class="db-table-header"><div class="db-table-icon">👤</div><h4>users 用户表</h4></div>
+            <div class="db-table-body">
+                <div class="db-field special"><span class="db-field-name">id</span><span class="db-field-type">INTEGER PK</span></div>
+                <div class="db-field"><span class="db-field-name">username</span><span class="db-field-type">VARCHAR(100) UK</span></div>
+                <div class="db-field"><span class="db-field-name">password_hash</span><span class="db-field-type">VARCHAR(255) bcrypt</span></div>
+                <div class="db-field"><span class="db-field-name">major / grade</span><span class="db-field-type">VARCHAR</span></div>
+                <div class="db-field"><span class="db-field-name">interests</span><span class="db-field-type">TEXT</span></div>
+            </div>
+        </div>
+        <div class="db-table" style="--i:1">
+            <div class="db-table-header"><div class="db-table-icon">📚</div><h4>courses 课程表</h4></div>
+            <div class="db-table-body">
+                <div class="db-field special"><span class="db-field-name">id</span><span class="db-field-type">INTEGER PK</span></div>
+                <div class="db-field"><span class="db-field-name">code</span><span class="db-field-type">VARCHAR(50) UK</span></div>
+                <div class="db-field"><span class="db-field-name">title / faculty</span><span class="db-field-type">VARCHAR</span></div>
+                <div class="db-field"><span class="db-field-name">course_type / instructor</span><span class="db-field-type">VARCHAR</span></div>
+                <div class="db-field"><span class="db-field-name">credits / difficulty</span><span class="db-field-type">INTEGER</span></div>
+                <div class="db-field"><span class="db-field-name">schedule_json</span><span class="db-field-type">JSON</span></div>
+            </div>
+        </div>
+        <div class="db-table" style="--i:2">
+            <div class="db-table-header"><div class="db-table-icon">✅</div><h4>selections 选课记录</h4></div>
+            <div class="db-table-body">
+                <div class="db-field special"><span class="db-field-name">id</span><span class="db-field-type">INTEGER PK</span></div>
+                <div class="db-field"><span class="db-field-name">user_id</span><span class="db-field-type">FK → users</span></div>
+                <div class="db-field"><span class="db-field-name">course_id</span><span class="db-field-type">FK → courses</span></div>
+                <div class="db-field special"><span class="db-field-name">UNIQUE(user, course)</span><span class="db-field-type">防重复</span></div>
+            </div>
+        </div>
+        <div class="db-table" style="--i:3">
+            <div class="db-table-header"><div class="db-table-icon">📊</div><h4>user_history 行为历史</h4></div>
+            <div class="db-table-body">
+                <div class="db-field special"><span class="db-field-name">id</span><span class="db-field-type">INTEGER PK</span></div>
+                <div class="db-field"><span class="db-field-name">user_id</span><span class="db-field-type">FK → users</span></div>
+                <div class="db-field"><span class="db-field-name">event_type</span><span class="db-field-type">VARCHAR(64)</span></div>
+                <div class="db-field"><span class="db-field-name">payload</span><span class="db-field-type">JSON</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="challenges">
+    <div class="section-header reveal">
+        <span class="section-tag">Challenges</span>
+        <h2 class="section-title">技术挑战与解决方案</h2>
+    </div>
+    <div class="accordion reveal">
+        <div class="accordion-item">
+            <div class="accordion-header"><div class="accordion-icon">1</div><h3>Agent 工具调用可靠性</h3><span class="accordion-arrow">▼</span></div>
+            <div class="accordion-body"><div class="accordion-body-inner">
+                <span class="label">问题</span><p>LLM 返回的工具调用格式不稳定，可能返回无效 JSON、错误参数或超时。</p>
+                <span class="label">解决方案</span><p>多层容错：①解析多种格式（代码块/直接JSON/花括号匹配）②工具参数智能补全（支持数字ID/课程代号/搜索缓存）③工具执行失败自动降级到规则引擎。</p>
+                <div class="code-block">
+<span class="kw">def</span> _resolve_course_ids(<span class="kw">self</span>, tool_args, message, user_id):
+    <span class="kw">for</span> key <span class="kw">in</span> (<span class="str">"course_id"</span>, <span class="str">"old_course_id"</span>, <span class="str">"new_course_id"</span>):
+        cid = tool_args.get(key)
+        <span class="kw">if</span> isinstance(cid, str) <span class="kw">and not</span> cid.isdigit():
+            course = db.query(Course).filter(Course.code.ilike(cid)).first()
+            <span class="kw">if</span> course: tool_args[key] = course.id
+    <span class="kw">if not</span> tool_args.get(<span class="str">"course_id"</span>):
+        <span class="kw">if</span> user_id <span class="kw">in</span> <span class="kw">self</span>._last_search:
+            tool_args[<span class="str">"course_id"</span>] = <span class="kw">self</span>._last_search[user_id][<span class="str">0</span>][<span class="str">"id"</span>]</div>
+            </div></div>
+        </div>
+        <div class="accordion-item">
+            <div class="accordion-header"><div class="accordion-icon">2</div><h3>自然语言意图识别</h3><span class="accordion-arrow">▼</span></div>
+            <div class="accordion-body"><div class="accordion-body-inner">
+                <span class="label">问题</span><p>用户表达多样化："帮我选CS101"、"退掉数学课"、"推荐一些编程课"、"好的"（确认词）。</p>
+                <span class="label">解决方案</span><p>正则匹配 + 关键词分类 + 搜索缓存 + 确认词机制，四级处理确保意图准确识别。</p>
+                <div class="code-block">
+KEYWORD_MAP = {
+    <span class="str">"add"</span>: [<span class="str">"选"</span>, <span class="str">"加"</span>, <span class="str">"选课"</span>, <span class="str">"想上"</span>],
+    <span class="str">"remove"</span>: [<span class="str">"退"</span>, <span class="str">"删"</span>, <span class="str">"不要"</span>, <span class="str">"退选"</span>],
+    <span class="str">"list"</span>: [<span class="str">"选了哪些"</span>, <span class="str">"我的课"</span>, <span class="str">"已选"</span>],
+    <span class="str">"recommend"</span>: [<span class="str">"推荐"</span>, <span class="str">"建议"</span>, <span class="str">"什么课好"</span>],
+}
+CONFIRM_WORDS = [<span class="str">"好的"</span>, <span class="str">"可以"</span>, <span class="str">"行"</span>, <span class="str">"确认"</span>, <span class="str">"添加"</span>]</div>
+            </div></div>
+        </div>
+        <div class="accordion-item">
+            <div class="accordion-header"><div class="accordion-icon">3</div><h3>策略模式解耦选课规则</h3><span class="accordion-arrow">▼</span></div>
+            <div class="accordion-body"><div class="accordion-body-inner">
+                <span class="label">问题</span><p>不同课程类型的选课规则混杂在 if-else 中，新增课程类型需要修改核心代码。</p>
+                <span class="label">解决方案</span><p>使用策略模式，将每种课程类型的选课规则封装为独立策略类。通过策略注册表动态分发，新增课程类型只需添加策略类并注册。</p>
+                <div class="code-block">
+<span class="kw">def</span> _get_strategy(course_type) -> <span class="tp">EnrollmentStrategy</span>:
+    <span class="kw">return</span> _strategies.get(course_type, _default_strategy)
+
+<span class="cmt"># 新增课程类型只需：</span>
+_strategies[<span class="str">"实验课"</span>] = LabCourseStrategy()  <span class="cmt"># 零改动扩展</span></div>
+            </div></div>
+        </div>
+        <div class="accordion-item">
+            <div class="accordion-header"><div class="accordion-icon">4</div><h3>前端状态多组件同步</h3><span class="accordion-arrow">▼</span></div>
+            <div class="accordion-body"><div class="accordion-body-inner">
+                <span class="label">问题</span><p>选课操作后，课程列表、已选标记、学分统计、推荐列表等多个组件需要同步更新。</p>
+                <span class="label">解决方案</span><p>使用 Pinia 观察者模式，Store Action 修改 State 后，Vue 响应式系统自动检测变化并更新所有订阅组件。</p>
+                <div class="code-block">
+<span class="cmt">// 选课操作后自动触发视图更新</span>
+<span class="kw">const</span> selectionStore = useSelectionStore()
+<span class="kw">await</span> selectionStore.addCourse(course)
+<span class="cmt">// CartSummary、CatalogView、Sidebar 自动响应</span></div>
+            </div></div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="metrics">
+    <div class="section-header reveal">
+        <span class="section-tag">Metrics</span>
+        <h2 class="section-title">项目数据</h2>
+    </div>
+    <div class="metrics-grid stagger">
+        <div class="metric-card" style="--i:0"><div class="metric-value" data-count="6">0</div><div class="metric-label">Agent 工具</div></div>
+        <div class="metric-card" style="--i:1"><div class="metric-value" data-count="9">0</div><div class="metric-label">设计模式</div></div>
+        <div class="metric-card" style="--i:2"><div class="metric-value" data-count="6">0</div><div class="metric-label">后端路由</div></div>
+        <div class="metric-card" style="--i:3"><div class="metric-value" data-count="4">0</div><div class="metric-label">数据表</div></div>
+        <div class="metric-card" style="--i:4"><div class="metric-value" data-count="36">0</div><div class="metric-label">课程数据</div></div>
+        <div class="metric-card" style="--i:5"><div class="metric-value" data-count="3">0</div><div class="metric-label">降级层级</div></div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header reveal">
+        <span class="section-tag">API</span>
+        <h2 class="section-title">接口设计</h2>
+    </div>
+    <div class="course-demo reveal">
+        <table class="course-table">
+            <thead><tr><th>模块</th><th>方法</th><th>路径</th><th>说明</th></tr></thead>
+            <tbody>
+                <tr><td><span class="badge badge-purple">认证</span></td><td>POST</td><td><code>/api/auth/register</code></td><td>用户注册</td></tr>
+                <tr><td><span class="badge badge-purple">认证</span></td><td>POST</td><td><code>/api/auth/login</code></td><td>用户登录</td></tr>
+                <tr><td><span class="badge badge-cyan">课程</span></td><td>GET</td><td><code>/api/courses/</code></td><td>课程列表</td></tr>
+                <tr><td><span class="badge badge-green">选课</span></td><td>POST</td><td><code>/api/selection/</code></td><td>批量选课</td></tr>
+                <tr><td><span class="badge badge-green">选课</span></td><td>DELETE</td><td><code>/api/selection/{id}</code></td><td>退选课程</td></tr>
+                <tr><td><span class="badge badge-cyan">推荐</span></td><td>GET</td><td><code>/api/recommendations/</code></td><td>课程推荐</td></tr>
+                <tr><td><span class="badge badge-purple">Agent</span></td><td>POST</td><td><code>/api/chat/</code></td><td>AI 对话选课</td></tr>
+                <tr><td><span class="badge badge-purple">个人</span></td><td>PUT</td><td><code>/api/profile/</code></td><td>更新资料</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-links">
+        <a href="#agent">AI Agent</a>
+        <a href="#patterns">设计模式</a>
+        <a href="#features">技术亮点</a>
+        <a href="#database">数据库</a>
+        <a href="#challenges">挑战</a>
+        <a href="#metrics">数据</a>
+    </div>
+    <p>智能选课系统 · AI Agent 驱动的全栈作品集</p>
+    <p style="margin-top: 0.5rem; color: var(--text-muted);">Vue 3 + FastAPI + SQLAlchemy + AI Agent</p>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .stagger').forEach(el => observer.observe(el));
+
+window.addEventListener('scroll', () => {
+    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+function animateCounters(container) {
+    container.querySelectorAll('[data-count]').forEach(el => {
+        const target = parseInt(el.dataset.count);
+        const duration = 1500; const start = performance.now();
+        function update(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            el.textContent = Math.round(target * (1 - Math.pow(1 - progress, 3)));
+            if (progress < 1) requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update);
+    });
+}
+const heroObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) { animateCounters(entry.target); heroObserver.unobserve(entry.target); } });
+}, { threshold: 0.5 });
+document.querySelectorAll('.hero-stats, .metrics-grid').forEach(el => heroObserver.observe(el));
+
+document.querySelectorAll('.accordion-header').forEach(header => {
+    header.addEventListener('click', () => {
+        const item = header.parentElement;
+        const body = item.querySelector('.accordion-body');
+        const isActive = item.classList.contains('active');
+        document.querySelectorAll('.accordion-item').forEach(i => { i.classList.remove('active'); i.querySelector('.accordion-body').style.maxHeight = '0'; });
+        if (!isActive) { item.classList.add('active'); body.style.maxHeight = body.scrollHeight + 'px'; }
+    });
+});
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+
+// Mermaid Init
+mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    securityLevel: 'loose',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif',
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+});
+</script>
+</body>
+</html>

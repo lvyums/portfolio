@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>楚韵 · 文字 — 项目展示</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --chu-gold: #C8960C;
+            --chu-gold-light: #E5B800;
+            --chu-gold-bg: rgba(200, 150, 12, 0.08);
+            --chu-red: #C44536;
+            --chu-red-light: #E25A4A;
+            --chu-red-bg: rgba(196, 69, 54, 0.06);
+            --chu-teal: #1A7A6D;
+            --chu-blue: #2D5F8A;
+            --bg: #FFFBF5;
+            --bg-card: #FFFFFF;
+            --bg-card-hover: #FFF9EE;
+            --border: #E8DFD0;
+            --border-light: #F0EAE0;
+            --text: #2C2418;
+            --text-dim: #6B5D4F;
+            --text-muted: #9C8E7E;
+            --shadow: 0 2px 8px rgba(44, 36, 24, 0.06), 0 1px 3px rgba(44, 36, 24, 0.04);
+            --shadow-lg: 0 8px 24px rgba(44, 36, 24, 0.1), 0 2px 8px rgba(44, 36, 24, 0.06);
+            --font-cn: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+            --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+        }
+
+        html { scroll-behavior: smooth; font-size: 16px; }
+
+        body {
+            font-family: var(--font-cn);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        ::selection { background: var(--chu-gold); color: #fff; }
+        a { color: var(--chu-gold); text-decoration: none; transition: color 0.3s; }
+        a:hover { color: var(--chu-gold-light); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--chu-gold); }
+
+        /* Mermaid */
+        .mermaid-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+        .mermaid { display: flex; justify-content: center; }
+        .mermaid svg { max-width: 100%; height: auto; }
+
+        /* Navigation */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 0 40px; height: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255, 251, 245, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+        }
+        .nav.scrolled {
+            border-bottom-color: var(--border);
+            background: rgba(255, 251, 245, 0.95);
+            box-shadow: 0 2px 12px rgba(44, 36, 24, 0.06);
+        }
+        .nav-logo { font-size: 1.2rem; font-weight: 700; color: var(--text); letter-spacing: 2px; }
+        .nav-logo span { color: var(--chu-gold); }
+        .nav-links { display: flex; gap: 28px; list-style: none; }
+        .nav-links a {
+            color: var(--text-dim); font-size: 0.85rem; letter-spacing: 1px;
+            transition: color 0.3s; position: relative;
+        }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -4px; left: 0;
+            width: 0; height: 2px; background: var(--chu-gold); transition: width 0.3s;
+        }
+        .nav-links a:hover { color: var(--chu-gold); }
+        .nav-links a:hover::after { width: 100%; }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            position: relative; overflow: hidden; padding: 80px 20px 60px;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(200, 150, 12, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 30%, rgba(196, 69, 54, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 80%, rgba(26, 122, 109, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .hero-grid {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(200, 150, 12, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200, 150, 12, 0.04) 1px, transparent 1px);
+            background-size: 60px 60px; pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 16px; border: 1px solid var(--border);
+            border-radius: 100px; font-size: 0.75rem; color: var(--text-dim);
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 32px;
+            opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s 0.3s forwards;
+        }
+        .hero-badge .dot { width: 6px; height: 6px; background: var(--chu-gold); border-radius: 50%; animation: pulse 2s infinite; }
+        .hero h1 {
+            font-size: clamp(2.8rem, 7vw, 5.5rem); font-weight: 800;
+            line-height: 1.15; letter-spacing: 4px; margin-bottom: 20px;
+            opacity: 0; transform: translateY(30px); animation: fadeUp 0.8s 0.5s forwards;
+        }
+        .hero h1 .gold { color: var(--chu-gold); }
+        .hero h1 .red { color: var(--chu-red); }
+        .hero-sub {
+            font-size: clamp(1rem, 2vw, 1.3rem); color: var(--text-dim);
+            max-width: 600px; margin-bottom: 40px;
+            opacity: 0; transform: translateY(30px); animation: fadeUp 0.8s 0.7s forwards;
+        }
+        .hero-stats {
+            display: flex; gap: 48px; flex-wrap: wrap; justify-content: center;
+            opacity: 0; transform: translateY(30px); animation: fadeUp 0.8s 0.9s forwards;
+        }
+        .hero-stat { text-align: center; }
+        .hero-stat .num { font-size: 2.2rem; font-weight: 800; color: var(--chu-gold); font-family: var(--font-mono); }
+        .hero-stat .label { font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; margin-top: 4px; }
+        .scroll-indicator {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            opacity: 0; animation: fadeUp 0.8s 1.2s forwards;
+        }
+        .scroll-indicator span { font-size: 0.65rem; color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase; }
+        .scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--chu-gold), transparent); animation: scrollDown 2s infinite; }
+
+        /* Sections */
+        .section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
+        .section-header { margin-bottom: 60px; }
+        .section-tag { font-size: 0.7rem; color: var(--chu-gold); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 12px; }
+        .section-title { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; letter-spacing: 2px; margin-bottom: 16px; }
+        .section-desc { color: var(--text-dim); max-width: 600px; font-size: 0.95rem; }
+        .divider { width: 60px; height: 2px; background: linear-gradient(to right, var(--chu-gold), transparent); margin: 16px 0; }
+
+        /* Reveal */
+        .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal-left.visible { opacity: 1; transform: translateX(0); }
+        .reveal-right { opacity: 0; transform: translateX(40px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal-right.visible { opacity: 1; transform: translateX(0); }
+        .stagger > * { transition-delay: calc(var(--i, 0) * 0.1s); }
+
+        /* Features Grid */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+        .feature-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 32px; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .feature-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(to right, var(--chu-gold), var(--chu-red), transparent);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .feature-card:hover { transform: translateY(-4px); border-color: var(--chu-gold); box-shadow: var(--shadow-lg); }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-icon {
+            width: 48px; height: 48px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; margin-bottom: 20px;
+            background: var(--chu-gold-bg); border: 1px solid rgba(200, 150, 12, 0.15);
+        }
+        .feature-card h3 { font-size: 1.1rem; margin-bottom: 10px; letter-spacing: 1px; }
+        .feature-card p { color: var(--text-dim); font-size: 0.88rem; line-height: 1.7; }
+        .feature-tag {
+            display: inline-block; padding: 2px 10px; font-size: 0.7rem;
+            border: 1px solid var(--border); border-radius: 100px;
+            color: var(--text-dim); margin-top: 14px; letter-spacing: 1px;
+        }
+
+        /* Architecture */
+        .arch-diagram {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 40px;
+            font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.6;
+            overflow-x: auto; white-space: pre; color: var(--text-dim); position: relative;
+        }
+        .arch-diagram .highlight { color: var(--chu-gold); font-weight: 600; }
+        .arch-diagram .red { color: var(--chu-red); }
+        .arch-diagram .blue { color: var(--chu-blue); }
+        .arch-diagram .green { color: var(--chu-teal); }
+        .arch-layers { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 32px; }
+        .arch-layer {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px; text-align: center; transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .arch-layer:hover { border-color: var(--chu-gold); box-shadow: var(--shadow); }
+        .arch-layer h4 { font-size: 0.8rem; color: var(--chu-gold); letter-spacing: 2px; margin-bottom: 8px; text-transform: uppercase; }
+        .arch-layer p { font-size: 0.78rem; color: var(--text-dim); font-family: var(--font-mono); }
+
+        /* Module Showcase */
+        .module-row { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; margin-bottom: 80px; }
+        .module-row.reverse { direction: rtl; }
+        .module-row.reverse > * { direction: ltr; }
+        .module-visual {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden; position: relative;
+        }
+        .module-visual-header {
+            padding: 12px 16px; background: #FAF6F0;
+            display: flex; align-items: center; gap: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        .window-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .window-dot.r { background: #ff5f57; }
+        .window-dot.y { background: #ffbd2e; }
+        .window-dot.g { background: #28c840; }
+        .module-visual-body {
+            padding: 24px; font-family: var(--font-mono); font-size: 0.75rem;
+            line-height: 1.8; color: var(--text-dim); min-height: 260px;
+        }
+        .module-visual-body .kw { color: var(--chu-red); }
+        .module-visual-body .fn { color: var(--chu-gold); }
+        .module-visual-body .str { color: var(--chu-teal); }
+        .module-visual-body .cm { color: var(--text-muted); }
+        .module-visual-body .num { color: var(--chu-blue); }
+        .module-info h3 { font-size: 1.4rem; margin-bottom: 12px; letter-spacing: 1px; }
+        .module-info p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 20px; }
+        .module-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .module-tag {
+            padding: 4px 12px; font-size: 0.72rem;
+            border: 1px solid var(--border); border-radius: 6px;
+            color: var(--text-dim); font-family: var(--font-mono);
+            background: var(--bg);
+        }
+
+        /* Map simulation */
+        .map-sim {
+            position: relative; height: 260px;
+            background: linear-gradient(135deg, #F5F0E8 0%, #EDE6D8 100%);
+            border-radius: 8px; overflow: hidden;
+        }
+        .map-dot {
+            position: absolute; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--chu-gold); box-shadow: 0 0 12px rgba(200, 150, 12, 0.4);
+            animation: mapPulse 3s infinite;
+        }
+        .map-dot.center {
+            width: 12px; height: 12px; background: var(--chu-red);
+            box-shadow: 0 0 16px rgba(196, 69, 54, 0.5); z-index: 2;
+        }
+        .map-label { position: absolute; font-size: 0.65rem; color: var(--text-dim); white-space: nowrap; }
+
+        /* Quiz simulation */
+        .quiz-sim { padding: 20px; }
+        .quiz-q { font-size: 0.9rem; color: var(--text); margin-bottom: 16px; font-family: var(--font-cn); }
+        .quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .quiz-opt {
+            padding: 10px 14px; background: #FAF6F0; border: 1px solid var(--border);
+            border-radius: 8px; font-size: 0.8rem; color: var(--text-dim);
+            cursor: pointer; transition: all 0.3s; font-family: var(--font-cn);
+        }
+        .quiz-opt:hover { border-color: var(--chu-gold); color: var(--text); background: var(--chu-gold-bg); }
+        .quiz-opt.correct { border-color: #2D9B4E; background: rgba(45, 155, 78, 0.08); color: #2D9B4E; }
+        .quiz-opt.wrong { border-color: var(--chu-red); background: var(--chu-red-bg); color: var(--chu-red); }
+
+        /* AI chat simulation */
+        .chat-sim { padding: 16px; }
+        .chat-msg {
+            padding: 12px 16px; border-radius: 12px; margin-bottom: 12px;
+            font-size: 0.82rem; line-height: 1.6; max-width: 85%; font-family: var(--font-cn);
+        }
+        .chat-msg.user {
+            background: rgba(45, 95, 138, 0.08); border: 1px solid rgba(45, 95, 138, 0.15);
+            margin-left: auto; color: var(--text);
+        }
+        .chat-msg.bot {
+            background: var(--chu-red-bg); border: 1px solid rgba(196, 69, 54, 0.1);
+            color: var(--text-dim);
+        }
+        .chat-cite {
+            display: inline-block; font-size: 0.65rem; color: var(--chu-gold);
+            border: 1px solid rgba(200, 150, 12, 0.2); padding: 1px 6px;
+            border-radius: 4px; margin-top: 6px;
+        }
+
+        /* Tech Stack */
+        .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
+        .tech-item {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px 16px; text-align: center;
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+        .tech-item:hover { transform: translateY(-3px); border-color: var(--chu-gold); box-shadow: var(--shadow); }
+        .tech-item .icon { font-size: 1.8rem; margin-bottom: 8px; }
+        .tech-item .name { font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; }
+        .tech-item .role { font-size: 0.68rem; color: var(--text-dim); }
+
+        /* Challenges */
+        .challenge-list { display: flex; flex-direction: column; gap: 20px; }
+        .challenge-item {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s; cursor: pointer;
+        }
+        .challenge-item:hover { border-color: var(--chu-gold); }
+        .challenge-head { padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
+        .challenge-num {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: var(--chu-gold-bg); border: 1px solid rgba(200, 150, 12, 0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; font-weight: 700; color: var(--chu-gold);
+            font-family: var(--font-mono); flex-shrink: 0;
+        }
+        .challenge-head h4 { font-size: 0.95rem; flex: 1; }
+        .challenge-toggle { font-size: 1.2rem; color: var(--text-dim); transition: transform 0.3s; }
+        .challenge-item.open .challenge-toggle { transform: rotate(45deg); }
+        .challenge-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .challenge-item.open .challenge-body { max-height: 400px; }
+        .challenge-content { padding: 0 24px 20px; font-size: 0.85rem; color: var(--text-dim); line-height: 1.8; }
+        .challenge-content code {
+            background: var(--chu-gold-bg); padding: 1px 6px; border-radius: 4px;
+            font-family: var(--font-mono); font-size: 0.78rem; color: var(--chu-gold);
+        }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 28px 24px; text-align: center;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .stat-card:hover { border-color: var(--chu-gold); box-shadow: var(--shadow); }
+        .stat-num { font-size: 2.4rem; font-weight: 800; color: var(--chu-gold); font-family: var(--font-mono); margin-bottom: 4px; }
+        .stat-label { font-size: 0.78rem; color: var(--text-dim); letter-spacing: 1px; }
+
+        /* Test Table */
+        .test-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; }
+        .test-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .test-table th {
+            background: var(--chu-gold-bg); padding: 14px 16px; text-align: left;
+            font-weight: 600; color: var(--chu-gold); letter-spacing: 1px;
+            border-bottom: 1px solid var(--border); white-space: nowrap;
+        }
+        .test-table td { padding: 12px 16px; border-bottom: 1px solid var(--border-light); color: var(--text-dim); }
+        .test-table tr:last-child td { border-bottom: none; }
+        .test-table tr:hover td { background: rgba(200, 150, 12, 0.03); }
+        .badge-pass {
+            display: inline-block; padding: 2px 10px; border-radius: 100px;
+            font-size: 0.7rem; background: rgba(45, 155, 78, 0.08);
+            color: #2D9B4E; border: 1px solid rgba(45, 155, 78, 0.2);
+        }
+
+        /* Footer */
+        .footer { padding: 60px 40px; text-align: center; border-top: 1px solid var(--border); margin-top: 60px; }
+        .footer-logo { font-size: 1.4rem; font-weight: 700; letter-spacing: 3px; margin-bottom: 12px; }
+        .footer-logo span { color: var(--chu-gold); }
+        .footer p { color: var(--text-dim); font-size: 0.82rem; margin-bottom: 6px; }
+        .footer-links { display: flex; justify-content: center; gap: 24px; margin-top: 20px; }
+        .footer-links a { color: var(--text-dim); font-size: 0.8rem; transition: color 0.3s; }
+        .footer-links a:hover { color: var(--chu-gold); }
+
+        /* Animations */
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        @keyframes scrollDown {
+            0% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+            50% { opacity: 0.5; transform: scaleY(0.5); transform-origin: top; }
+            100% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+        }
+        @keyframes mapPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.6; } }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav { padding: 0 20px; }
+            .nav-links { gap: 16px; }
+            .nav-links a { font-size: 0.75rem; }
+            .section { padding: 60px 20px; }
+            .hero { padding: 80px 16px 60px; }
+            .hero-stats { gap: 28px; }
+            .module-row { grid-template-columns: 1fr; gap: 24px; }
+            .module-row.reverse { direction: ltr; }
+            .features-grid { grid-template-columns: 1fr; }
+            .arch-layers { grid-template-columns: 1fr 1fr; }
+            .tech-grid { grid-template-columns: repeat(3, 1fr); }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .quiz-opts { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .nav-links { display: none; }
+            .tech-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+    <a href="./index.html" class="nav-logo">← 返回作品集</a>
+    <ul class="nav-links">
+        <li><a href="https://github.com/lvyums/chu2" target="_blank" style="color:var(--chu-gold);font-weight:600;">GitHub</a></li>
+        <li><a href="#features">功能</a></li>
+        <li><a href="#architecture">架构</a></li>
+        <li><a href="#modules">模块</a></li>
+        <li><a href="#tech">技术栈</a></li>
+        <li><a href="#challenges">难点</a></li>
+        <li><a href="#testing">测试</a></li>
+    </ul>
+</nav>
+
+<section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-badge"><span class="dot"></span>大学生创新创业训练计划项目</div>
+    <h1><span class="gold">楚韵</span> · <span class="red">文字</span></h1>
+    <p class="hero-sub">集时空地图、文物图鉴、AI 智能问答于一体的楚文字知识性科普平台<br>独立完成全栈开发与容器化部署</p>
+    <div class="hero-stats">
+        <div class="hero-stat"><div class="num" data-count="5">0</div><div class="label">核心模块</div></div>
+        <div class="hero-stat"><div class="num" data-count="8">0</div><div class="label">RESTful API</div></div>
+        <div class="hero-stat"><div class="num" data-count="50">0</div><div class="label">题库题目</div></div>
+        <div class="hero-stat"><div class="num" data-count="2">0</div><div class="label">Docker 服务</div></div>
+    </div>
+    <div class="scroll-indicator"><span>Scroll</span><div class="scroll-line"></div></div>
+</section>
+
+<section class="section" id="features">
+    <div class="section-header reveal">
+        <div class="section-tag">Features</div>
+        <h2 class="section-title">核心功能</h2>
+        <div class="divider"></div>
+        <p class="section-desc">五大功能模块，覆盖楚文化科普的可视化、交互与智能化场景</p>
+    </div>
+    <div class="features-grid stagger">
+        <div class="feature-card reveal" style="--i:0">
+            <div class="feature-icon">🗺️</div>
+            <h3>时空可视化地图</h3>
+            <p>Leaflet 交互地图 + 时间轴滑块，动态展示楚国疆域变迁与遗址分布，支持悬停高亮与详情弹窗</p>
+            <span class="feature-tag">Leaflet.js · 时间轴过滤</span>
+        </div>
+        <div class="feature-card reveal" style="--i:1">
+            <div class="feature-icon">🖼️</div>
+            <h3>简牍文物图鉴</h3>
+            <p>卡片式展示楚地出土简牍文物，高清影像 + 分类标签 + 悬停效果，沉浸式浏览体验</p>
+            <span class="feature-tag">CSS Grid · 动态渲染</span>
+        </div>
+        <div class="feature-card reveal" style="--i:2">
+            <div class="feature-icon">📚</div>
+            <h3>学术资料库</h3>
+            <p>提供楚文化研究 PDF 文档与图片资料的在线预览和下载，支持文件类型自动分类</p>
+            <span class="feature-tag">文件服务 · 在线预览</span>
+        </div>
+        <div class="feature-card reveal" style="--i:3">
+            <div class="feature-icon">🎮</div>
+            <h3>楚韵 · 文字挑战</h3>
+            <p>50+ 道题库的互动知识问答，涵盖字形辨析、历史典故与器物知识，即时反馈 + 学术解析</p>
+            <span class="feature-tag">状态机 · 随机题库</span>
+        </div>
+        <div class="feature-card reveal" style="--i:4">
+            <div class="feature-icon">🤖</div>
+            <h3>AI 智能助手</h3>
+            <p>基于智谱 AI 知识库的 RAG 问答系统，回答楚系文字与考古问题，引文标注确保有据可查</p>
+            <span class="feature-tag">RAG · GLM-4 · 知识库</span>
+        </div>
+        <div class="feature-card reveal" style="--i:5">
+            <div class="feature-icon">🛡️</div>
+            <h3>管理后台</h3>
+            <p>Flask-Admin 可视化仪表盘，支持遗址、题库、中心点数据的 CRUD 操作与 CSV 导出</p>
+            <span class="feature-tag">Flask-Admin · 权限控制</span>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="architecture">
+    <div class="section-header reveal">
+        <div class="section-tag">Architecture</div>
+        <h2 class="section-title">系统架构</h2>
+        <div class="divider"></div>
+        <p class="section-desc">前后端分离 + 容器化部署，Nginx 反向代理 + Gunicorn WSGI + PostgreSQL</p>
+    </div>
+
+    <!-- Mermaid Architecture Diagram -->
+    <div class="mermaid-container reveal">
+        <pre class="mermaid">
+graph TB
+    subgraph 用户层
+        Browser[用户浏览器]
+    end
+
+    subgraph 前端页面
+        Index[首页]
+        Map[时空地图]
+        Gallery[文物图鉴]
+        Game[文字挑战]
+    end
+
+    subgraph Nginx
+        NginxProxy[Nginx反向代理]
+    end
+
+    subgraph Flask应用
+        Gunicorn[Gunicorn 3 Workers]
+        PageRoutes[页面路由]
+        APIRoutes[API接口]
+        Admin[Flask-Admin]
+        DB[database.py]
+    end
+
+    subgraph 数据层
+        SQLite[(SQLite/PostgreSQL)]
+        JSON[JSON静态文件]
+        ZhipuAI[智谱AI API]
+    end
+
+    Browser --> Index
+    Browser --> Map
+    Browser --> Gallery
+    Browser --> Game
+    Index --> NginxProxy
+    Map --> NginxProxy
+    Gallery --> NginxProxy
+    Game --> NginxProxy
+    NginxProxy --> Gunicorn
+    Gunicorn --> PageRoutes
+    Gunicorn --> APIRoutes
+    Gunicorn --> Admin
+    Gunicorn --> DB
+    PageRoutes --> SQLite
+    APIRoutes --> JSON
+    APIRoutes --> ZhipuAI
+    DB --> SQLite
+
+    style Browser fill:#E8F5E9,stroke:#4CAF50
+    style NginxProxy fill:#E3F2FD,stroke:#2196F3
+    style Gunicorn fill:#E3F2FD,stroke:#2196F3
+    style SQLite fill:#FFF3E0,stroke:#FF9800
+    style JSON fill:#FFF3E0,stroke:#FF9800
+    style ZhipuAI fill:#F3E5F5,stroke:#9C27B0
+        </pre>
+    </div>
+
+    <!-- Architecture Layers -->
+    <div class="arch-layers stagger">
+        <div class="arch-layer reveal" style="--i:0"><h4>Frontend</h4><p>HTML5 · CSS3 · ES6+<br>Leaflet.js · ES Modules</p></div>
+        <div class="arch-layer reveal" style="--i:1"><h4>Backend</h4><p>Flask · SQLAlchemy<br>Flask-Admin · Gunicorn</p></div>
+        <div class="arch-layer reveal" style="--i:2"><h4>AI Layer</h4><p>Streamlit · ZhipuAI<br>GLM-4 · Zai 知识库</p></div>
+        <div class="arch-layer reveal" style="--i:3"><h4>Data</h4><p>SQLite / PostgreSQL<br>JSON · Docker Volume</p></div>
+        <div class="arch-layer reveal" style="--i:4"><h4>DevOps</h4><p>Docker Compose · Nginx<br>Systemd · .env</p></div>
+    </div>
+</section>
+
+<section class="section" id="modules">
+    <div class="section-header reveal">
+        <div class="section-tag">Modules</div>
+        <h2 class="section-title">模块设计</h2>
+        <div class="divider"></div>
+        <p class="section-desc">每个模块独立封装，前端 ES Module 按需加载，后端 RESTful API 解耦</p>
+    </div>
+
+    <div class="module-row">
+        <div class="module-visual reveal-left">
+            <div class="module-visual-header">
+                <span class="window-dot r"></span><span class="window-dot y"></span><span class="window-dot g"></span>
+                <span style="font-size:0.7rem;color:var(--text-dim);margin-left:8px">mapModule.js</span>
+            </div>
+            <div class="module-visual-body">
+                <div class="map-sim">
+                    <div class="map-dot center" style="top:45%;left:40%"></div>
+                    <div class="map-dot" style="top:35%;left:55%;animation-delay:0.5s"></div>
+                    <div class="map-dot" style="top:55%;left:60%;animation-delay:1s"></div>
+                    <div class="map-dot" style="top:50%;left:30%;animation-delay:1.5s"></div>
+                    <div class="map-dot" style="top:65%;left:45%;animation-delay:2s"></div>
+                    <div class="map-dot" style="top:30%;left:35%;animation-delay:0.8s"></div>
+                    <div class="map-label" style="top:42%;left:42%;color:var(--chu-red)">郢都</div>
+                    <div class="map-label" style="top:32%;left:57%">包山</div>
+                    <div class="map-label" style="top:52%;left:62%">望山</div>
+                    <div class="map-label" style="top:47%;left:22%">郭店</div>
+                    <div class="map-label" style="top:62%;left:47%">天星观</div>
+                    <div class="map-label" style="top:27%;left:37%">信阳</div>
+                    <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none">
+                        <line x1="40%" y1="47%" x2="55%" y2="37%" stroke="rgba(200,150,12,0.2)" stroke-width="1" stroke-dasharray="4,4"/>
+                        <line x1="40%" y1="47%" x2="60%" y2="57%" stroke="rgba(200,150,12,0.2)" stroke-width="1" stroke-dasharray="4,4"/>
+                        <line x1="40%" y1="47%" x2="30%" y2="52%" stroke="rgba(200,150,12,0.2)" stroke-width="1" stroke-dasharray="4,4"/>
+                        <line x1="40%" y1="47%" x2="45%" y2="67%" stroke="rgba(200,150,12,0.2)" stroke-width="1" stroke-dasharray="4,4"/>
+                        <line x1="40%" y1="47%" x2="35%" y2="32%" stroke="rgba(200,150,12,0.2)" stroke-width="1" stroke-dasharray="4,4"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="module-info reveal-right">
+            <h3>时空地图模块</h3>
+            <p>Leaflet 交互地图，以郢都为中心点，虚线连接各考古遗址。时间轴滑块驱动遗址按年份动态显隐，悬停高亮变色，点击弹窗展示详情。</p>
+            <div class="module-tags">
+                <span class="module-tag">Leaflet.js</span>
+                <span class="module-tag">CircleMarker</span>
+                <span class="module-tag">时间轴过滤</span>
+                <span class="module-tag">Popup</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="module-row reverse">
+        <div class="module-visual reveal-right">
+            <div class="module-visual-header">
+                <span class="window-dot r"></span><span class="window-dot y"></span><span class="window-dot g"></span>
+                <span style="font-size:0.7rem;color:var(--text-dim);margin-left:8px">gameModule.js</span>
+            </div>
+            <div class="module-visual-body quiz-sim">
+                <div class="quiz-q">第 <span style="color:var(--chu-gold)">2</span> / 5 题 — 这个楚简文字最可能代表哪个含义？</div>
+                <div class="quiz-opts" id="quizDemo">
+                    <div class="quiz-opt" onclick="quizClick(this, false)">A. 日</div>
+                    <div class="quiz-opt" onclick="quizClick(this, true)">B. 月</div>
+                    <div class="quiz-opt" onclick="quizClick(this, false)">C. 星</div>
+                    <div class="quiz-opt" onclick="quizClick(this, false)">D. 云</div>
+                </div>
+                <div id="quizFeedback" style="margin-top:14px;font-size:0.78rem;display:none">
+                    <span style="color:#2D9B4E">正确！</span> 该字形出自郭店楚简《老子》，是楚系简帛文字的典型代表。
+                </div>
+            </div>
+        </div>
+        <div class="module-info reveal-left">
+            <h3>文字挑战模块</h3>
+            <p>纯前端状态机驱动的互动问答游戏。从 50+ 道题库随机抽取 5 题，涵盖字形辨析、历史典故与器物知识，即时反馈 + 学术解析。</p>
+            <div class="module-tags">
+                <span class="module-tag">状态机模式</span>
+                <span class="module-tag">Fisher-Yates</span>
+                <span class="module-tag">JSON 题库</span>
+                <span class="module-tag">DOM 操作</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="module-row">
+        <div class="module-visual reveal-left">
+            <div class="module-visual-header">
+                <span class="window-dot r"></span><span class="window-dot y"></span><span class="window-dot g"></span>
+                <span style="font-size:0.7rem;color:var(--text-dim);margin-left:8px">ai_assistant.py</span>
+            </div>
+            <div class="module-visual-body chat-sim">
+                <div class="chat-msg user">郭店楚简出土于哪一年？</div>
+                <div class="chat-msg bot">
+                    郭店楚简于 <strong>1993 年</strong>出土于湖北省荆门市郭店村，共存竹简 804 枚，其中包含《老子》《缁衣》等早期儒道文献，是战国中期楚国墓葬的重要发现。
+                    <div class="chat-cite">引用自知识库：楚简出土情况汇总</div>
+                </div>
+                <div class="chat-msg user">鸟虫书是什么？</div>
+                <div class="chat-msg bot">
+                    鸟虫书是楚系文字中一种极具装饰性的书体，笔画中融入鸟形、虫形纹饰，常见于青铜器铭文与玺印文字。其艺术特征为笔画盘曲、结构繁复，兼具文字功能与审美价值。
+                    <div class="chat-cite">引用自知识库：楚系文字研究</div>
+                </div>
+            </div>
+        </div>
+        <div class="module-info reveal-right">
+            <h3>AI 智能助手</h3>
+            <p>基于智谱 AI GLM-4-Flash + Zai 知识库的 RAG 问答系统。强制触发知识库检索，引文标注来源，System Prompt 设定博物馆讲解员角色，通俗但不失严谨。</p>
+            <div class="module-tags">
+                <span class="module-tag">RAG</span>
+                <span class="module-tag">ZhipuAI SDK</span>
+                <span class="module-tag">Streamlit</span>
+                <span class="module-tag">引文标注</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="tech">
+    <div class="section-header reveal">
+        <div class="section-tag">Tech Stack</div>
+        <h2 class="section-title">技术栈</h2>
+        <div class="divider"></div>
+    </div>
+    <div class="tech-grid stagger">
+        <div class="tech-item reveal" style="--i:0"><div class="icon">🐍</div><div class="name">Python</div><div class="role">后端语言</div></div>
+        <div class="tech-item reveal" style="--i:1"><div class="icon">🌶️</div><div class="name">Flask</div><div class="role">Web 框架</div></div>
+        <div class="tech-item reveal" style="--i:2"><div class="icon">🗃️</div><div class="name">SQLAlchemy</div><div class="role">ORM</div></div>
+        <div class="tech-item reveal" style="--i:3"><div class="icon">🐘</div><div class="name">PostgreSQL</div><div class="role">生产数据库</div></div>
+        <div class="tech-item reveal" style="--i:4"><div class="icon">🗺️</div><div class="name">Leaflet.js</div><div class="role">地图引擎</div></div>
+        <div class="tech-item reveal" style="--i:5"><div class="icon">⚡</div><div class="name">JavaScript</div><div class="role">ES6+ / Modules</div></div>
+        <div class="tech-item reveal" style="--i:6"><div class="icon">🤖</div><div class="name">智谱AI</div><div class="role">GLM-4 / RAG</div></div>
+        <div class="tech-item reveal" style="--i:7"><div class="icon">🐳</div><div class="name">Docker</div><div class="role">容器化部署</div></div>
+        <div class="tech-item reveal" style="--i:8"><div class="icon">🔧</div><div class="name">Nginx</div><div class="role">反向代理</div></div>
+        <div class="tech-item reveal" style="--i:9"><div class="icon">⚙️</div><div class="name">Gunicorn</div><div class="role">WSGI 服务器</div></div>
+        <div class="tech-item reveal" style="--i:10"><div class="icon">🛡️</div><div class="name">Flask-Admin</div><div class="role">后台管理</div></div>
+        <div class="tech-item reveal" style="--i:11"><div class="icon">📊</div><div class="name">Streamlit</div><div class="role">AI 前端</div></div>
+    </div>
+</section>
+
+<section class="section" id="challenges">
+    <div class="section-header reveal">
+        <div class="section-tag">Challenges</div>
+        <h2 class="section-title">技术难点与解决方案</h2>
+        <div class="divider"></div>
+        <p class="section-desc">开发过程中遇到的核心技术挑战及对应的解决方案</p>
+    </div>
+    <div class="challenge-list">
+        <div class="challenge-item reveal" onclick="toggleChallenge(this)">
+            <div class="challenge-head">
+                <span class="challenge-num">01</span>
+                <h4>开发/生产数据库无缝切换</h4>
+                <span class="challenge-toggle">+</span>
+            </div>
+            <div class="challenge-body"><div class="challenge-content">
+                <strong>问题：</strong>本地开发使用 SQLite，生产部署使用 PostgreSQL，连接字符串和 SQL 方言存在差异。<br><br>
+                <strong>方案：</strong>通过环境变量 <code>DATABASE_URL</code> 实现自动切换，优先读取环境变量，未设置时回退到 SQLite。Docker Compose 通过 <code>environment</code> 注入 PostgreSQL 地址，本地开发零配置。
+            </div></div>
+        </div>
+        <div class="challenge-item reveal" onclick="toggleChallenge(this)">
+            <div class="challenge-head">
+                <span class="challenge-num">02</span>
+                <h4>RAG 知识库检索不触发</h4>
+                <span class="challenge-toggle">+</span>
+            </div>
+            <div class="challenge-body"><div class="challenge-content">
+                <strong>问题：</strong>智谱 AI API 调用时，模型有时跳过知识库检索，直接用自身知识回答，导致领域准确性不足。<br><br>
+                <strong>方案：</strong>设置 <code>tool_choice: {"type": "retrieval"}</code> 强制触发检索；编写专用 prompt_template 要求优先使用知识库内容；降低 temperature 至 0.2；开启引文标注验证检索是否生效。
+            </div></div>
+        </div>
+        <div class="challenge-item reveal" onclick="toggleChallenge(this)">
+            <div class="challenge-head">
+                <span class="challenge-num">03</span>
+                <h4>Flask-Admin 路由冲突</h4>
+                <span class="challenge-toggle">+</span>
+            </div>
+            <div class="challenge-body"><div class="challenge-content">
+                <strong>问题：</strong>Flask-Admin 初始化时注册路由，若在 app.py 路由定义之前初始化，会与自定义路由冲突。<br><br>
+                <strong>方案：</strong>将 Admin 初始化延迟到所有路由注册之后，逻辑独立到 <code>admin.py</code> 模块，app.py 末尾调用 <code>init_admin(app)</code>。
+            </div></div>
+        </div>
+        <div class="challenge-item reveal" onclick="toggleChallenge(this)">
+            <div class="challenge-head">
+                <span class="challenge-num">04</span>
+                <h4>容器首次启动数据库初始化</h4>
+                <span class="challenge-toggle">+</span>
+            </div>
+            <div class="challenge-body"><div class="challenge-content">
+                <strong>问题：</strong>Docker 容器首次启动时数据库为空，表结构和初始数据需要手动导入。<br><br>
+                <strong>方案：</strong>编写 <code>migrate.py</code> 统一迁移脚本，支持 <code>init</code>（建表）、<code>migrate</code>（导入数据）、<code>validate</code>（校验完整性）三个子命令，配合 Docker Compose 的 <code>depends_on</code> 确保数据库就绪后再执行。
+            </div></div>
+        </div>
+        <div class="challenge-item reveal" onclick="toggleChallenge(this)">
+            <div class="challenge-head">
+                <span class="challenge-num">05</span>
+                <h4>悬浮球拖动与点击事件冲突</h4>
+                <span class="challenge-toggle">+</span>
+            </div>
+            <div class="challenge-body"><div class="challenge-content">
+                <strong>问题：</strong>AI 助手悬浮球需同时支持点击跳转和长按拖动，但 click 事件在 mouseup 后立即触发，拖动后也发生跳转。<br><br>
+                <strong>方案：</strong>引入 <code>data-dragging</code> 标记位，长按 300ms 进入拖动模式后设置标记，click 事件中检查标记决定是否阻止跳转，拖动位置保存到 localStorage 持久化。
+            </div></div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="testing">
+    <div class="section-header reveal">
+        <div class="section-tag">Testing & Stats</div>
+        <h2 class="section-title">测试效果与项目数据</h2>
+        <div class="divider"></div>
+    </div>
+    <div class="stats-grid stagger" style="margin-bottom:48px">
+        <div class="stat-card reveal" style="--i:0"><div class="stat-num" data-count="400">0</div><div class="stat-label">后端代码 (行)</div></div>
+        <div class="stat-card reveal" style="--i:1"><div class="stat-num" data-count="4">0</div><div class="stat-label">JS 模块</div></div>
+        <div class="stat-card reveal" style="--i:2"><div class="stat-num" data-count="6">0</div><div class="stat-label">页面模板</div></div>
+        <div class="stat-card reveal" style="--i:3"><div class="stat-num" data-count="3">0</div><div class="stat-label">数据库表</div></div>
+        <div class="stat-card reveal" style="--i:4"><div class="stat-num" data-count="8">0</div><div class="stat-label">API 接口</div></div>
+        <div class="stat-card reveal" style="--i:5"><div class="stat-num" data-count="16">0</div><div class="stat-label">测试用例</div></div>
+    </div>
+    <div class="test-table-wrap reveal">
+        <table class="test-table">
+            <thead><tr><th>模块</th><th>测试项</th><th>预期效果</th><th>结果</th></tr></thead>
+            <tbody>
+                <tr><td>时空地图</td><td>时间轴拖动筛选</td><td>遗址按年份动态显隐</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>时空地图</td><td>点击遗址弹窗</td><td>显示名称/年份/描述</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>时空地图</td><td>悬停高亮</td><td>圆点变红 + 连线变实线</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>文物图鉴</td><td>卡片加载</td><td>正确显示图片/标题/描述</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>文物图鉴</td><td>图片加载失败</td><td>自动回退占位图</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>文字挑战</td><td>随机抽题</td><td>每次从 50+ 题库随机 5 题</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>文字挑战</td><td>答题反馈</td><td>正确绿色/错误红色 + 解析</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>AI 助手</td><td>知识库问答</td><td>返回引文标注的回答</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>AI 助手</td><td>无数据场景</td><td>诚实告知 "暂无此记录"</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>AI 助手</td><td>悬浮球拖动</td><td>长按拖动 + 位置持久化</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>管理后台</td><td>登录认证</td><td>密码正确进入/错误拒绝</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>管理后台</td><td>CRUD 操作</td><td>遗址/题库增删改查</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>管理后台</td><td>数据导出</td><td>CSV/Excel 导出</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>Docker</td><td>一键启动</td><td>docker-compose up 正常运行</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>Docker</td><td>数据持久化</td><td>容器重启数据不丢失</td><td><span class="badge-pass">通过</span></td></tr>
+                <tr><td>Docker</td><td>环境隔离</td><td>开发/生产配置自动切换</td><td><span class="badge-pass">通过</span></td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-logo">楚韵<span>·</span>文字</div>
+    <p>楚文字知识性科普平台 · 大学生创新创业训练计划项目</p>
+    <p style="font-size:0.75rem;color:var(--text-muted)">独立完成全栈开发与容器化部署</p>
+    <div class="footer-links">
+        <a href="https://github.com/lvyums/chu2" target="_blank">GitHub</a>
+        <a href="#features">功能</a>
+        <a href="#architecture">架构</a>
+        <a href="#modules">模块</a>
+        <a href="#tech">技术栈</a>
+    </div>
+    <p style="margin-top:24px;font-size:0.7rem;color:var(--text-muted)">&copy; 2025 楚文千机团队</p>
+</footer>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 50); });
+
+const observerOptions = { threshold: 0.15, rootMargin: '0px 0px -40px 0px' };
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+}, observerOptions);
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+
+function animateCounters() {
+    document.querySelectorAll('[data-count]').forEach(el => {
+        if (el.dataset.animated) return;
+        const target = parseInt(el.dataset.count);
+        const duration = 1500; const start = performance.now();
+        function update(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            el.textContent = Math.round(target * (1 - Math.pow(1 - progress, 3)));
+            if (progress < 1) requestAnimationFrame(update); else el.dataset.animated = '1';
+        }
+        requestAnimationFrame(update);
+    });
+}
+const heroObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) { setTimeout(animateCounters, 500); heroObserver.unobserve(entry.target); } });
+}, { threshold: 0.3 });
+heroObserver.observe(document.querySelector('.hero-stats'));
+
+function toggleChallenge(item) {
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.challenge-item.open').forEach(el => el.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+}
+
+function quizClick(el, correct) {
+    const opts = document.querySelectorAll('#quizDemo .quiz-opt');
+    if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+    opts.forEach(o => o.style.pointerEvents = 'none');
+    if (correct) { el.classList.add('correct'); } else { el.classList.add('wrong'); opts[1].classList.add('correct'); }
+    const fb = document.getElementById('quizFeedback');
+    fb.style.display = 'block';
+    fb.querySelector('span').textContent = correct ? '正确！' : '错误！';
+    fb.querySelector('span').style.color = correct ? '#2D9B4E' : '#C44536';
+}
+
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+        if (href.startsWith('#')) { e.preventDefault(); document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' }); }
+    });
+});
+
+// Mermaid Init
+mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    securityLevel: 'loose',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif',
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+});
+</script>
+
+</body>
+</html>

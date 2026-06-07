@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>飞书 AI 智能助手 — 作品集</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+/* ===== CSS Variables ===== */
+:root {
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-hero: linear-gradient(135deg, #1E3A5F 0%, #2563EB 50%, #0891B2 100%);
+  --text: #1E293B;
+  --text-dim: #64748B;
+  --border: #E2E8F0;
+  --primary: #2563EB;
+  --primary-light: #3B82F6;
+  --accent: #0891B2;
+  --accent-light: #06B6D4;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+  --radius: 12px;
+  --radius-lg: 20px;
+}
+
+/* ===== Reset ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ===== Navigation ===== */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  background: rgba(248,250,252,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+}
+.nav-back {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav-back:hover { color: var(--primary); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; position: relative; }
+.nav-links a:hover { color: var(--primary); }
+.nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: var(--primary); transition: width 0.3s; }
+.nav-links a:hover::after { width: 100%; }
+
+/* ===== Hero ===== */
+.hero {
+  min-height: 60vh;
+  background: var(--bg-hero);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 120px 40px 80px;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+}
+.hero-badge {
+  display: inline-block;
+  padding: 8px 20px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 50px;
+  color: rgba(255,255,255,0.9);
+  font-size: 0.85rem;
+  margin-bottom: 24px;
+}
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 16px;
+}
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 32px;
+}
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+}
+.stat-item { text-align: center; }
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  display: block;
+}
+.stat-label {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+}
+
+/* ===== Section Common ===== */
+.section {
+  padding: 80px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.section-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.section-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(37,99,235,0.1);
+  color: var(--primary);
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.section-desc {
+  font-size: 1rem;
+  color: var(--text-dim);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ===== Mermaid Container ===== */
+.mermaid-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  margin-bottom: 48px;
+  overflow-x: auto;
+}
+.mermaid {
+  display: flex;
+  justify-content: center;
+}
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ===== Features Grid ===== */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  transition: all 0.3s;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+.feature-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  background: rgba(37,99,235,0.1);
+  color: var(--primary);
+}
+.feature-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.feature-card p {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
+/* ===== Skills Table ===== */
+.skills-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.skills-table th,
+.skills-table td {
+  padding: 16px 20px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.skills-table th {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.skills-table tr:last-child td {
+  border-bottom: none;
+}
+.skills-table tr:hover td {
+  background: rgba(37,99,235,0.03);
+}
+.skill-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(37,99,235,0.1);
+  color: var(--primary);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin: 2px;
+}
+
+/* ===== Code Block ===== */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius);
+  padding: 24px;
+  overflow-x: auto;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  margin: 24px 0;
+}
+.code-block .keyword { color: #C084FC; }
+.code-block .string { color: #86EFAC; }
+.code-block .comment { color: #64748B; }
+.code-block .function { color: #60A5FA; }
+
+/* ===== Metrics Grid ===== */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+}
+.metric-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+.metric-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.metric-label {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+/* ===== Challenges Accordion ===== */
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.accordion-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.accordion-header {
+  padding: 20px 24px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+.accordion-header:hover {
+  background: rgba(37,99,235,0.03);
+}
+.accordion-header .icon {
+  transition: transform 0.3s;
+}
+.accordion-item.active .accordion-header .icon {
+  transform: rotate(180deg);
+}
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.accordion-content-inner {
+  padding: 0 24px 20px;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+.accordion-content-inner code {
+  background: rgba(37,99,235,0.1);
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+/* ===== Footer ===== */
+.footer {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ===== Back to Top ===== */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(37,99,235,0.3);
+  border: none;
+  z-index: 99;
+}
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ===== Reveal Animation ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .nav { padding: 12px 20px; }
+  .nav-links { display: none; }
+  .hero { padding: 100px 20px 60px; }
+  .hero h1 { font-size: 2rem; }
+  .hero-stats { gap: 24px; }
+  .stat-number { font-size: 2rem; }
+  .section { padding: 60px 20px; }
+  .section-title { font-size: 1.5rem; }
+  .features-grid { grid-template-columns: 1fr; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .mermaid-container { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav" id="nav">
+    <a href="./index.html" class="nav-logo" style="text-decoration:none;">← 返回作品集</a>
+  <ul class="nav-links">
+    <li><a href="#architecture">架构</a></li>
+    <li><a href="#plugin">插件化</a></li>
+    <li><a href="#features">功能</a></li>
+    <li><a href="#tech">技术栈</a></li>
+    <li><a href="#metrics">数据</a></li>
+  </ul>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">AI Agent · 飞书集成</div>
+    <h1>飞书 AI 智能助手</h1>
+    <p class="hero-subtitle">
+      基于 Hermes Agent 框架开发的飞书 AI 助手，实现智能对话、任务管理与工作流自动化
+    </p>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-number" data-target="50">0</span>
+        <span class="stat-label">日均请求</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="3">0</span>
+        <span class="stat-label">自定义 Skills</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="12">0</span>
+        <span class="stat-label">小时开发周期</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture Section -->
+<section class="section" id="architecture">
+  <div class="section-header reveal">
+    <span class="section-badge">架构设计</span>
+    <h2 class="section-title">系统架构</h2>
+    <p class="section-desc">Hermes Agent + 飞书开放平台 + 自定义 Skills</p>
+  </div>
+  <div class="mermaid-container reveal">
+    <pre class="mermaid">
+graph TB
+    User[用户] -->|发送消息| FeishuAPI[飞书API]
+    FeishuAPI -->|Webhook| Bot[飞书机器人]
+    Bot --> Router[消息路由器]
+    Router --> IntentEngine[意图识别]
+    IntentEngine --> ToolRegistry[工具注册表]
+
+    ToolRegistry --> TodoSkill[todo任务管理]
+    ToolRegistry --> RemindSkill[remind定时提醒]
+    ToolRegistry --> DeadlineSkill[deadline截止追踪]
+
+    TodoSkill --> Redis[(Redis)]
+    RemindSkill --> APScheduler[APScheduler]
+    DeadlineSkill --> Redis
+
+    Bot --> WeatherAPI[天气API]
+    Bot --> LLM[LLM API]
+
+    style User fill:#E8F5E9,stroke:#4CAF50
+    style FeishuAPI fill:#E8F5E9,stroke:#4CAF50
+    style Bot fill:#E3F2FD,stroke:#2196F3
+    style Router fill:#E3F2FD,stroke:#2196F3
+    style IntentEngine fill:#E3F2FD,stroke:#2196F3
+    style ToolRegistry fill:#E3F2FD,stroke:#2196F3
+    style TodoSkill fill:#BBDEFB,stroke:#2196F3
+    style RemindSkill fill:#BBDEFB,stroke:#2196F3
+    style DeadlineSkill fill:#BBDEFB,stroke:#2196F3
+    style Redis fill:#FFF3E0,stroke:#FF9800
+    style APScheduler fill:#FFF3E0,stroke:#FF9800
+    style WeatherAPI fill:#F3E5F5,stroke:#9C27B0
+    style LLM fill:#F3E5F5,stroke:#9C27B0
+    </pre>
+  </div>
+</section>
+
+<!-- Plugin Architecture Section -->
+<section class="section" id="plugin">
+  <div class="section-header reveal">
+    <span class="section-badge">架构亮点</span>
+    <h2 class="section-title">插件化架构</h2>
+    <p class="section-desc">基于 Hermes Agent 的 Skill 插件机制</p>
+  </div>
+  <div class="mermaid-container reveal">
+    <pre class="mermaid">
+graph LR
+    Core[核心引擎] -->|加载| PluginLoader[插件加载器]
+    PluginLoader -->|注册| EventBus[事件总线]
+    EventBus --> Interface[Skill接口]
+    Interface --> Register[register]
+    Interface --> Execute[execute]
+    Interface --> Validate[validate]
+
+    Register --> S1[todo_skill]
+    Register --> S2[remind_skill]
+    Register --> S3[deadline_skill]
+    Register --> S4[weather_skill]
+    Register --> S5[report_skill]
+
+    style Core fill:#E3F2FD,stroke:#2196F3
+    style PluginLoader fill:#E3F2FD,stroke:#2196F3
+    style EventBus fill:#E3F2FD,stroke:#2196F3
+    style Interface fill:#E8F5E9,stroke:#4CAF50
+    style Register fill:#E8F5E9,stroke:#4CAF50
+    style Execute fill:#E8F5E9,stroke:#4CAF50
+    style Validate fill:#E8F5E9,stroke:#4CAF50
+    style S1 fill:#FFF3E0,stroke:#FF9800
+    style S2 fill:#FFF3E0,stroke:#FF9800
+    style S3 fill:#FFF3E0,stroke:#FF9800
+    style S4 fill:#FFF3E0,stroke:#FF9800
+    style S5 fill:#FFF3E0,stroke:#FF9800
+    </pre>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="section" id="features">
+  <div class="section-header reveal">
+    <span class="section-badge">核心功能</span>
+    <h2 class="section-title">功能模块</h2>
+    <p class="section-desc">三大核心 Skills + 信息聚合推送</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon">✅</div>
+      <h3>/todo 任务管理</h3>
+      <p>创建待办任务，支持自然语言解析时间。"明天下午3点提醒我开会" 自动解析为具体时间，集成 APScheduler 定时提醒。</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">⏰</div>
+      <h3>/remind 定时提醒</h3>
+      <p>设置定时提醒，支持一次性提醒和周期性提醒。集成 Redis 持久化存储，确保提醒不丢失。</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">📅</div>
+      <h3>/deadline 截止追踪</h3>
+      <p>追踪任务截止日期，自动汇总本周待办。支持按优先级排序，临近截止自动升级提醒频率。</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">📰</div>
+      <h3>每日早报推送</h3>
+      <p>自动汇总天气、日程、待办，每日早晨定时推送。集成外部 API 数据源，减少重复性人工操作。</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">📊</div>
+      <h3>周报自动生成</h3>
+      <p>汇总本周完成任务与下周计划，自动生成周报。支持自定义模板，一键导出为文档。</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🔌</div>
+      <h3>插件化架构</h3>
+      <p>基于 Hermes Agent 的 Skill 插件机制，各功能模块独立开发、测试与扩展。新功能开发周期从 2 天缩短至半天。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Skills Table Section -->
+<section class="section">
+  <div class="section-header reveal">
+    <span class="section-badge">技术实现</span>
+    <h2 class="section-title">Skills 开发详情</h2>
+    <p class="section-desc">自定义 Skills 的触发方式与实现逻辑</p>
+  </div>
+  <table class="skills-table reveal">
+    <thead>
+      <tr>
+        <th>Skill</th>
+        <th>功能</th>
+        <th>触发方式</th>
+        <th>技术实现</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>/todo</code></td>
+        <td>创建待办任务</td>
+        <td>"明天下午3点提醒我开会"</td>
+        <td><span class="skill-tag">NLP 时间解析</span><span class="skill-tag">Redis 存储</span></td>
+      </tr>
+      <tr>
+        <td><code>/remind</code></td>
+        <td>设置定时提醒</td>
+        <td>"提醒我周五交周报"</td>
+        <td><span class="skill-tag">APScheduler</span><span class="skill-tag">飞书消息</span></td>
+      </tr>
+      <tr>
+        <td><code>/deadline</code></td>
+        <td>截止日期追踪</td>
+        <td>"查看本周截止的任务"</td>
+        <td><span class="skill-tag">时间过滤</span><span class="skill-tag">优先级排序</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Code Example Section -->
+<section class="section">
+  <div class="section-header reveal">
+    <span class="section-badge">代码示例</span>
+    <h2 class="section-title">核心代码</h2>
+    <p class="section-desc">自定义 Skills 实现示例</p>
+  </div>
+  <div class="code-block reveal">
+    <span class="comment"># /todo 任务创建 Skill</span><br>
+    <span class="keyword">@skill</span>(<span class="string">"/todo"</span>)<br>
+    <span class="keyword">def</span> <span class="function">create_todo</span>(user_id: str, task: str, due_date: str = <span class="keyword">None</span>):<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"""创建待办任务，支持自然语言解析时间"""</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># "明天下午3点提醒我开会" → 解析为具体时间</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;parsed_time = parse_natural_time(due_date)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;redis_client.hset(<span class="string">f"todo:{user_id}"</span>, task, parsed_time)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="string">f"已创建待办：{task}，截止时间：{parsed_time}"</span><br><br>
+
+    <span class="comment"># /remind 定时提醒 Skill</span><br>
+    <span class="keyword">@skill</span>(<span class="string">"/remind"</span>)<br>
+    <span class="keyword">def</span> <span class="function">set_reminder</span>(user_id: str, message: str, time: str):<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"""设置定时提醒，集成 APScheduler"""</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;scheduler.add_job(<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;send_reminder,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">'date'</span>,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run_date=time,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;args=[user_id, message]<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="string">f"已设置提醒：{message}，时间：{time}"</span>
+  </div>
+</section>
+
+<!-- Metrics Section -->
+<section class="section" id="metrics">
+  <div class="section-header reveal">
+    <span class="section-badge">项目数据</span>
+    <h2 class="section-title">核心指标</h2>
+    <p class="section-desc">项目关键数据一览</p>
+  </div>
+  <div class="metrics-grid">
+    <div class="metric-card reveal">
+      <div class="metric-value" data-target="50">0</div>
+      <div class="metric-label">日均对话请求</div>
+    </div>
+    <div class="metric-card reveal">
+      <div class="metric-value" data-target="3">0</div>
+      <div class="metric-label">自定义 Skills</div>
+    </div>
+    <div class="metric-card reveal">
+      <div class="metric-value">0.5天</div>
+      <div class="metric-label">新功能开发周期</div>
+    </div>
+    <div class="metric-card reveal">
+      <div class="metric-value">24/7</div>
+      <div class="metric-label">服务可用性</div>
+    </div>
+  </div>
+</section>
+
+<!-- Challenges Section -->
+<section class="section">
+  <div class="section-header reveal">
+    <span class="section-badge">技术挑战</span>
+    <h2 class="section-title">挑战与解决方案</h2>
+    <p class="section-desc">开发过程中遇到的关键问题</p>
+  </div>
+  <div class="accordion">
+    <div class="accordion-item reveal">
+      <div class="accordion-header">
+        <span>自然语言时间解析</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-content-inner">
+          <p><strong>问题：</strong>用户输入"明天下午3点"、"下周五"、"3天后"等多样化时间表达，需要准确解析为具体时间。</p>
+          <p><strong>方案：</strong>集成 NLP 时间解析库，结合正则匹配和语义理解，支持相对时间、绝对时间、模糊时间等多种表达方式。解析失败时回退到用户确认流程。</p>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item reveal">
+      <div class="accordion-header">
+        <span>飞书消息格式适配</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-content-inner">
+          <p><strong>问题：</strong>飞书消息支持多种格式（文本、卡片、富文本），不同场景需要选择合适的格式。</p>
+          <p><strong>方案：</strong>设计消息格式策略，简单回复用文本，结构化数据用卡片，长文本用富文本。通过装饰器模式统一消息发送接口。</p>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item reveal">
+      <div class="accordion-header">
+        <span>定时任务可靠性</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-content-inner">
+          <p><strong>问题：</strong>APScheduler 默认内存存储，服务重启后定时任务丢失。</p>
+          <p><strong>方案：</strong>将定时任务持久化到 Redis，服务启动时从 Redis 恢复任务。实现任务执行幂等性，防止重复执行。</p>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item reveal">
+      <div class="accordion-header">
+        <span>多群聊上下文隔离</span>
+        <span class="icon">▼</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-content-inner">
+          <p><strong>问题：</strong>机器人同时服务多个群聊，需要隔离不同群的上下文和数据。</p>
+          <p><strong>方案：</strong>以 <code>chat_id</code> 作为隔离键，Redis Hash 存储各群独立的待办、提醒等数据。会话状态通过 <code>user_id + chat_id</code> 组合键管理。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack Section -->
+<section class="section" id="tech">
+  <div class="section-header reveal">
+    <span class="section-badge">技术栈</span>
+    <h2 class="section-title">技术选型</h2>
+    <p class="section-desc">项目使用的核心技术</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon">🐍</div>
+      <h3>Python</h3>
+      <p>主要开发语言，用于 Agent 开发、Skills 实现、API 对接</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🤖</div>
+      <h3>Hermes Agent</h3>
+      <p>NousResearch 开源 Agent 框架，提供工具调用、对话管理等能力</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">💬</div>
+      <h3>飞书开放平台</h3>
+      <p>飞书 API 对接，实现消息收发、群聊管理、用户认证</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">⏰</div>
+      <h3>APScheduler</h3>
+      <p>Python 定时任务框架，支持一次性任务和周期性任务</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🗄️</div>
+      <h3>Redis</h3>
+      <p>数据持久化存储，存储待办、提醒、会话状态等数据</p>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">🔌</div>
+      <h3>hermes-feishu</h3>
+      <p>飞书插件，封装飞书 API 调用，简化消息收发流程</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>© 2026 张雯炫 · 飞书 AI 智能助手作品集</p>
+  <p style="margin-top: 8px;"><a href="../index.html" style="color: var(--primary); text-decoration: none;">← 返回后端 & AI 作品集</a></p>
+</footer>
+
+<!-- Back to Top -->
+<button class="back-to-top" id="backToTop">↑</button>
+
+<script>
+// ===== Mermaid Init =====
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'default',
+  securityLevel: 'loose',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif',
+  flowchart: {
+    useMaxWidth: true,
+    htmlLabels: true,
+    curve: 'basis'
+  }
+});
+
+// ===== Counter Animation =====
+function animateCounters() {
+  const counters = document.querySelectorAll('.stat-number[data-target], .metric-value[data-target]');
+  counters.forEach(counter => {
+    const target = parseInt(counter.getAttribute('data-target'));
+    const duration = 2000;
+    const increment = target / (duration / 16);
+    let current = 0;
+
+    const updateCounter = () => {
+      current += increment;
+      if (current < target) {
+        counter.textContent = Math.floor(current);
+        requestAnimationFrame(updateCounter);
+      } else {
+        counter.textContent = target;
+      }
+    };
+    updateCounter();
+  });
+}
+
+// ===== Accordion =====
+document.querySelectorAll('.accordion-header').forEach(header => {
+  header.addEventListener('click', () => {
+    const item = header.parentElement;
+    const content = item.querySelector('.accordion-content');
+    const isActive = item.classList.contains('active');
+
+    // Close all
+    document.querySelectorAll('.accordion-item').forEach(i => {
+      i.classList.remove('active');
+      i.querySelector('.accordion-content').style.maxHeight = '0';
+    });
+
+    // Open clicked
+    if (!isActive) {
+      item.classList.add('active');
+      content.style.maxHeight = content.scrollHeight + 'px';
+    }
+  });
+});
+
+// ===== Reveal Animation =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ===== Back to Top =====
+const backToTop = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+  backToTop.classList.toggle('visible', window.scrollY > 500);
+});
+backToTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ===== Init =====
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(animateCounters, 500);
+});
+</script>
+</body>
+</html>
