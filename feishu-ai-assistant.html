@@ -3,31 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>飞书 AI 智能助手 — 作品集</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<title>张雯炫 — AI 增强开发能力</title>
 <style>
-/* ===== CSS Variables ===== */
+/* ===== Reset & Variables ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-  --bg: #F8FAFC;
+  --bg: #F5F3FF;
   --bg-card: #FFFFFF;
-  --bg-hero: linear-gradient(135deg, #1E3A5F 0%, #2563EB 50%, #0891B2 100%);
-  --text: #1E293B;
-  --text-dim: #64748B;
-  --border: #E2E8F0;
-  --primary: #2563EB;
-  --primary-light: #3B82F6;
-  --accent: #0891B2;
-  --accent-light: #06B6D4;
-  --success: #10B981;
-  --warning: #F59E0B;
-  --shadow: 0 1px 3px rgba(0,0,0,0.1);
-  --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+  --bg-hero: linear-gradient(135deg, #0F0A2E 0%, #312E81 40%, #6366F1 70%, #8B5CF6 100%);
+  --text: #1E1B4B;
+  --text-dim: #6B7280;
+  --text-light: #9CA3AF;
+  --border: #E0E7FF;
+  --primary: #6366F1;
+  --primary-light: #818CF8;
+  --primary-dark: #4F46E5;
+  --accent-purple: #8B5CF6;
+  --accent-pink: #EC4899;
+  --accent-cyan: #06B6D4;
+  --accent-amber: #F59E0B;
+  --accent-green: #10B981;
+  --shadow: 0 1px 3px rgba(99,102,241,0.1);
+  --shadow-lg: 0 10px 40px rgba(99,102,241,0.12);
   --radius: 12px;
   --radius-lg: 20px;
 }
-
-/* ===== Reset ===== */
-* { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -35,6 +35,18 @@ body {
   color: var(--text);
   line-height: 1.6;
   overflow-x: hidden;
+}
+
+/* ===== Scroll Progress ===== */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent-purple), var(--accent-pink));
+  z-index: 1000;
+  width: 0;
+  transition: width 0.1s;
 }
 
 /* ===== Navigation ===== */
@@ -48,34 +60,59 @@ body {
   justify-content: space-between;
   align-items: center;
   z-index: 100;
-  background: rgba(248,250,252,0.85);
+  background: rgba(245,243,255,0.85);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s;
+}
+.nav.scrolled {
+  border-bottom-color: var(--border);
+  box-shadow: var(--shadow);
 }
 .nav-logo {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   text-decoration: none;
 }
 .nav-back {
   color: var(--text-dim);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   gap: 6px;
+  transition: color 0.3s;
 }
 .nav-back:hover { color: var(--primary); }
 .nav-links { display: flex; gap: 2rem; list-style: none; }
-.nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; position: relative; }
+.nav-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color 0.3s;
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--accent-purple));
+  transition: width 0.3s;
+}
 .nav-links a:hover { color: var(--primary); }
-.nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: var(--primary); transition: width 0.3s; }
 .nav-links a:hover::after { width: 100%; }
 
-/* ===== Hero ===== */
+/* ===== Hero Section ===== */
 .hero {
-  min-height: 60vh;
+  min-height: 100vh;
   background: var(--bg-hero);
   display: flex;
   align-items: center;
@@ -88,39 +125,72 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background:
+    radial-gradient(circle at 20% 50%, rgba(139,92,246,0.15) 0%, transparent 60%),
+    radial-gradient(circle at 80% 30%, rgba(6,182,212,0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(236,72,153,0.1) 0%, transparent 50%);
+}
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 80px 80px;
 }
 .hero-content {
   position: relative;
   z-index: 2;
   text-align: center;
-  max-width: 800px;
+  max-width: 900px;
 }
 .hero-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 8px 20px;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
   border-radius: 50px;
   color: rgba(255,255,255,0.9);
-  font-size: 0.85rem;
-  margin-bottom: 24px;
+  font-size: 0.82rem;
+  margin-bottom: 28px;
+  backdrop-filter: blur(10px);
 }
+.hero-badge .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 .hero h1 {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 800;
   color: white;
   margin-bottom: 16px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.hero h1 .gradient-text {
+  background: linear-gradient(135deg, #A78BFA, #F472B6, #22D3EE);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .hero-subtitle {
   font-size: 1.15rem;
-  color: rgba(255,255,255,0.8);
-  margin-bottom: 32px;
+  color: rgba(255,255,255,0.75);
+  max-width: 650px;
+  margin: 0 auto 40px;
+  line-height: 1.7;
 }
 .hero-stats {
   display: flex;
   justify-content: center;
-  gap: 48px;
+  gap: 56px;
+  flex-wrap: wrap;
 }
 .stat-item { text-align: center; }
 .stat-number {
@@ -128,10 +198,43 @@ body {
   font-weight: 800;
   color: white;
   display: block;
+  line-height: 1;
 }
 .stat-label {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.7);
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.6);
+  margin-top: 6px;
+}
+
+/* ===== Floating AI Elements ===== */
+.floating-elements {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.float-item {
+  position: absolute;
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.75rem;
+  font-family: 'Menlo', 'Consolas', monospace;
+  animation: floatAround 20s ease-in-out infinite;
+  backdrop-filter: blur(5px);
+}
+.float-item:nth-child(1) { top: 15%; left: 8%; animation-delay: 0s; }
+.float-item:nth-child(2) { top: 25%; right: 10%; animation-delay: -4s; }
+.float-item:nth-child(3) { bottom: 20%; left: 12%; animation-delay: -8s; }
+.float-item:nth-child(4) { bottom: 30%; right: 8%; animation-delay: -12s; }
+.float-item:nth-child(5) { top: 45%; left: 5%; animation-delay: -16s; }
+@keyframes floatAround {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-20px) rotate(2deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(15px) rotate(-2deg); }
 }
 
 /* ===== Section Common ===== */
@@ -142,26 +245,28 @@ body {
 }
 .section-header {
   text-align: center;
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
 .section-badge {
   display: inline-block;
   padding: 6px 16px;
-  background: rgba(37,99,235,0.1);
+  background: rgba(99,102,241,0.08);
   color: var(--primary);
   border-radius: 50px;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(99,102,241,0.12);
 }
 .section-title {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 800;
   color: var(--text);
   margin-bottom: 12px;
+  letter-spacing: -0.02em;
 }
+.section-title .accent { background: linear-gradient(135deg, var(--primary), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .section-desc {
   font-size: 1rem;
   color: var(--text-dim);
@@ -169,194 +274,328 @@ body {
   margin: 0 auto;
 }
 
-/* ===== Mermaid Container ===== */
-.mermaid-container {
+/* ===== AI Toolchain Cards ===== */
+.toolchain-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.tool-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  transition: all 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.tool-card:hover::before { opacity: 1; }
+.tool-card.claude::before { background: linear-gradient(90deg, #d97706, #f59e0b); }
+.tool-card.hermes::before { background: linear-gradient(90deg, var(--primary), var(--accent-purple)); }
+.tool-card.deepseek::before { background: linear-gradient(90deg, #0ea5e9, #06b6d4); }
+.tool-card.tools::before { background: linear-gradient(90deg, var(--accent-green), #34d399); }
+.tool-card.prompt::before { background: linear-gradient(90deg, var(--accent-pink), #f472b6); }
+.tool-card.rag::before { background: linear-gradient(90deg, var(--accent-amber), #fbbf24); }
+.tool-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(99,102,241,0.2);
+}
+.tool-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin-bottom: 18px;
+}
+.tool-icon.purple { background: rgba(99,102,241,0.1); }
+.tool-icon.amber { background: rgba(245,158,11,0.1); }
+.tool-icon.blue { background: rgba(6,182,212,0.1); }
+.tool-icon.green { background: rgba(16,185,129,0.1); }
+.tool-icon.pink { background: rgba(236,72,153,0.1); }
+.tool-icon.orange { background: rgba(245,158,11,0.1); }
+.tool-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.tool-card .tool-sub {
+  font-size: 0.78rem;
+  color: var(--primary);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+.tool-card p {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+.tool-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+.tool-tag {
+  padding: 3px 10px;
+  background: rgba(99,102,241,0.06);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+/* ===== Workflow Diagram ===== */
+.workflow-container {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 40px;
-  margin-bottom: 48px;
   overflow-x: auto;
 }
-.mermaid {
+.workflow-flow {
   display: flex;
+  align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
 }
-.mermaid svg {
-  max-width: 100%;
-  height: auto;
+.wf-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(99,102,241,0.04);
+  border: 1px solid rgba(99,102,241,0.1);
+  border-radius: var(--radius);
+  min-width: 100px;
+  transition: all 0.3s;
+}
+.wf-node:hover {
+  border-color: var(--primary);
+  background: rgba(99,102,241,0.08);
+  box-shadow: 0 4px 16px rgba(99,102,241,0.1);
+}
+.wf-node-icon { font-size: 1.5rem; margin-bottom: 8px; }
+.wf-node-label { font-size: 0.78rem; color: var(--text-dim); text-align: center; font-weight: 500; }
+.wf-node .wf-sub {
+  font-size: 0.65rem;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+.wf-arrow {
+  font-size: 1.2rem;
+  color: var(--primary);
+  padding: 0 6px;
+  opacity: 0.5;
 }
 
-/* ===== Features Grid ===== */
-.features-grid {
+/* ===== Usage Examples ===== */
+.examples-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
 }
-.feature-card {
+.example-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 32px;
+  padding: 24px;
   transition: all 0.3s;
 }
-.feature-card:hover {
+.example-card:hover {
+  border-color: rgba(99,102,241,0.2);
+  box-shadow: var(--shadow-lg);
+}
+.example-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.example-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+.example-avatar.claude { background: rgba(245,158,11,0.1); }
+.example-avatar.hermes { background: rgba(99,102,241,0.1); }
+.example-avatar.deepseek { background: rgba(6,182,212,0.1); }
+.example-name { font-size: 0.9rem; font-weight: 700; }
+.example-role { font-size: 0.72rem; color: var(--text-light); }
+.example-desc { font-size: 0.85rem; color: var(--text-dim); line-height: 1.7; }
+.example-desc code {
+  background: rgba(99,102,241,0.06);
+  color: var(--primary);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+.example-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.example-tag {
+  padding: 2px 10px;
+  background: rgba(99,102,241,0.06);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: var(--primary);
+}
+
+/* ===== Skill Matrix ===== */
+.matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.matrix-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.matrix-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
   border-color: var(--primary);
 }
-.feature-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  background: rgba(37,99,235,0.1);
-  color: var(--primary);
-}
-.feature-card h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-.feature-card p {
-  color: var(--text-dim);
-  font-size: 0.95rem;
-}
-
-/* ===== Skills Table ===== */
-.skills-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--bg-card);
-  border-radius: var(--radius);
+.matrix-icon { font-size: 2rem; margin-bottom: 12px; }
+.matrix-label { font-size: 0.82rem; color: var(--text-dim); }
+.matrix-level {
+  margin-top: 10px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
   overflow: hidden;
-  box-shadow: var(--shadow);
 }
-.skills-table th,
-.skills-table td {
-  padding: 16px 20px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-.skills-table th {
-  background: var(--primary);
-  color: white;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-.skills-table tr:last-child td {
-  border-bottom: none;
-}
-.skills-table tr:hover td {
-  background: rgba(37,99,235,0.03);
-}
-.skill-tag {
-  display: inline-block;
-  padding: 4px 10px;
-  background: rgba(37,99,235,0.1);
-  color: var(--primary);
-  border-radius: 6px;
-  font-size: 0.8rem;
-  margin: 2px;
+.matrix-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--accent-purple));
 }
 
-/* ===== Code Block ===== */
-.code-block {
-  background: #1E293B;
-  color: #E2E8F0;
+/* ===== Prompt Gallery ===== */
+.prompt-card {
+  background: #1E1B4B;
   border-radius: var(--radius);
   padding: 24px;
-  overflow-x: auto;
-  font-family: 'Fira Code', 'Consolas', monospace;
-  font-size: 0.85rem;
-  line-height: 1.8;
-  margin: 24px 0;
+  margin-bottom: 16px;
+  color: #E0E7FF;
+  font-family: 'Menlo', 'Consolas', monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
 }
-.code-block .keyword { color: #C084FC; }
-.code-block .string { color: #86EFAC; }
-.code-block .comment { color: #64748B; }
-.code-block .function { color: #60A5FA; }
+.prompt-card .prompt-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.prompt-card .prompt-model {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.prompt-model.claude { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.prompt-model.hermes { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+.prompt-model.deepseek { background: rgba(6,182,212,0.15); color: #22d3ee; }
+.prompt-card .prompt-type {
+  font-size: 0.7rem;
+  color: var(--text-light);
+}
+.prompt-card .prompt-content { color: #c7d2fe; }
+.prompt-card .prompt-content .highlight-pink { color: #f472b6; }
+.prompt-card .prompt-content .highlight-green { color: #34d399; }
+.prompt-card .prompt-content .highlight-blue { color: #38bdf8; }
+
+/* ===== Tech Stack ===== */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.tech-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.3s;
+}
+.tech-item:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.tech-icon { font-size: 1.3rem; width: 32px; text-align: center; }
+.tech-name { font-size: 0.85rem; font-weight: 600; }
+.tech-desc { font-size: 0.72rem; color: var(--text-light); }
 
 /* ===== Metrics Grid ===== */
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 40px;
 }
 .metric-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 32px;
+  padding: 28px;
   text-align: center;
   transition: all 0.3s;
 }
 .metric-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
 }
 .metric-value {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 800;
-  color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 8px;
+  font-family: 'Menlo', 'Consolas', monospace;
 }
 .metric-label {
   color: var(--text-dim);
-  font-size: 0.9rem;
-}
-
-/* ===== Challenges Accordion ===== */
-.accordion {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.accordion-item {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-.accordion-header {
-  padding: 20px 24px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  transition: all 0.3s;
-}
-.accordion-header:hover {
-  background: rgba(37,99,235,0.03);
-}
-.accordion-header .icon {
-  transition: transform 0.3s;
-}
-.accordion-item.active .accordion-header .icon {
-  transform: rotate(180deg);
-}
-.accordion-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-.accordion-content-inner {
-  padding: 0 24px 20px;
-  color: var(--text-dim);
-  font-size: 0.95rem;
-  line-height: 1.8;
-}
-.accordion-content-inner code {
-  background: rgba(37,99,235,0.1);
-  color: var(--primary);
-  padding: 2px 8px;
-  border-radius: 4px;
   font-size: 0.85rem;
+}
+.metric-sub {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  margin-top: 4px;
 }
 
 /* ===== Footer ===== */
@@ -367,6 +606,8 @@ body {
   font-size: 0.85rem;
   border-top: 1px solid var(--border);
 }
+.footer a { color: var(--primary); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
 
 /* ===== Back to Top ===== */
 .back-to-top {
@@ -375,7 +616,7 @@ body {
   right: 30px;
   width: 48px;
   height: 48px;
-  border-radius: 50%;
+  border-radius: 14px;
   background: var(--primary);
   color: white;
   display: flex;
@@ -386,14 +627,12 @@ body {
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(37,99,235,0.3);
+  box-shadow: 0 4px 15px rgba(99,102,241,0.3);
   border: none;
   z-index: 99;
 }
-.back-to-top.visible {
-  opacity: 1;
-  visibility: visible;
-}
+.back-to-top.visible { opacity: 1; visibility: visible; }
+.back-to-top:hover { transform: translateY(-3px); background: var(--primary-dark); }
 
 /* ===== Reveal Animation ===== */
 .reveal {
@@ -401,452 +640,548 @@ body {
   transform: translateY(30px);
   transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+.reveal.visible { opacity: 1; transform: translateY(0); }
 
 /* ===== Responsive ===== */
+@media (max-width: 1024px) {
+  .toolchain-grid { grid-template-columns: repeat(2, 1fr); }
+  .matrix-grid { grid-template-columns: repeat(2, 1fr); }
+  .tech-grid { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 768px) {
   .nav { padding: 12px 20px; }
   .nav-links { display: none; }
   .hero { padding: 100px 20px 60px; }
-  .hero h1 { font-size: 2rem; }
+  .hero h1 { font-size: 2.2rem; }
   .hero-stats { gap: 24px; }
   .stat-number { font-size: 2rem; }
   .section { padding: 60px 20px; }
-  .section-title { font-size: 1.5rem; }
-  .features-grid { grid-template-columns: 1fr; }
+  .section-title { font-size: 1.6rem; }
+  .toolchain-grid { grid-template-columns: 1fr; }
+  .examples-grid { grid-template-columns: 1fr; }
+  .matrix-grid { grid-template-columns: repeat(2, 1fr); }
   .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-  .mermaid-container { padding: 20px; }
+  .tech-grid { grid-template-columns: 1fr; }
+  .workflow-flow { flex-direction: column; }
+  .wf-arrow { transform: rotate(90deg); padding: 4px 0; }
 }
 </style>
 </head>
 <body>
 
+<div class="scroll-progress" id="scrollProgress"></div>
+
 <!-- Navigation -->
-<nav class="nav" id="nav">
-    <a href="./index.html" class="nav-logo" style="text-decoration:none;">← 返回作品集</a>
+<nav class="nav" id="mainNav">
+  <a href="./index.html" class="nav-logo" style="text-decoration:none;">AI 能力图谱</a>
   <ul class="nav-links">
-    <li><a href="#architecture">架构</a></li>
-    <li><a href="#plugin">插件化</a></li>
-    <li><a href="#features">功能</a></li>
-    <li><a href="#tech">技术栈</a></li>
-    <li><a href="#metrics">数据</a></li>
+    <li><a href="#toolchain">工具链</a></li>
+    <li><a href="#workflow">工作流</a></li>
+    <li><a href="#examples">实践案例</a></li>
+    <li><a href="#skills">能力</a></li>
+    <li><a href="#stack">技术</a></li>
   </ul>
 </nav>
 
-<!-- Hero Section -->
+<!-- Hero -->
 <section class="hero">
+  <div class="hero-grid"></div>
+  <div class="floating-elements">
+    <div class="float-item">Claude Sonnet 4</div>
+    <div class="float-item">Hermes Agent</div>
+    <div class="float-item">DeepSeek V4</div>
+    <div class="float-item">Chain-of-Thought</div>
+    <div class="float-item">Tool Use</div>
+  </div>
   <div class="hero-content">
-    <div class="hero-badge">AI Agent · 飞书集成</div>
-    <h1>飞书 AI 智能助手</h1>
+    <div class="hero-badge">
+      <span class="dot"></span>
+      深度 AI 使用者 · 不是调 API，而是用 AI 重构开发方式
+    </div>
+    <h1>
+      <span class="gradient-text">AI 增强开发</span><br>
+      能力与实践
+    </h1>
     <p class="hero-subtitle">
-      基于 Hermes Agent 框架开发的飞书 AI 助手，实现智能对话、任务管理与工作流自动化
+      从 Claude 到 Hermes Agent，从 Prompt Engineering 到 Agent 开发——
+      这不是教你"接入 AI"，而是展示我如何将 AI 深度嵌入日常开发全流程
     </p>
     <div class="hero-stats">
       <div class="stat-item">
-        <span class="stat-number" data-target="50">0</span>
-        <span class="stat-label">日均请求</span>
+        <span class="stat-number">6+</span>
+        <span class="stat-label">AI 模型工具</span>
       </div>
       <div class="stat-item">
-        <span class="stat-number" data-target="3">0</span>
-        <span class="stat-label">自定义 Skills</span>
+        <span class="stat-number">3</span>
+        <span class="stat-label">Agent 框架</span>
       </div>
       <div class="stat-item">
-        <span class="stat-number" data-target="12">0</span>
-        <span class="stat-label">小时开发周期</span>
+        <span class="stat-number">90%</span>
+        <span class="stat-label">代码 AI 辅助率</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">5</span>
+        <span class="stat-label">自建 AI 项目</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Architecture Section -->
-<section class="section" id="architecture">
+<!-- AI Toolchain -->
+<section class="section" id="toolchain">
   <div class="section-header reveal">
-    <span class="section-badge">架构设计</span>
-    <h2 class="section-title">系统架构</h2>
-    <p class="section-desc">Hermes Agent + 飞书开放平台 + 自定义 Skills</p>
+    <span class="section-badge">我的 AI 工具库</span>
+    <h2 class="section-title">日常 <span class="accent">AI 工具链</span></h2>
+    <p class="section-desc">不是列 API 清单，而是我真正每天在用、深度掌握的 AI 工具</p>
   </div>
-  <div class="mermaid-container reveal">
-    <pre class="mermaid">
-graph TB
-    User[用户] -->|发送消息| FeishuAPI[飞书API]
-    FeishuAPI -->|Webhook| Bot[飞书机器人]
-    Bot --> Router[消息路由器]
-    Router --> IntentEngine[意图识别]
-    IntentEngine --> ToolRegistry[工具注册表]
-
-    ToolRegistry --> TodoSkill[todo任务管理]
-    ToolRegistry --> RemindSkill[remind定时提醒]
-    ToolRegistry --> DeadlineSkill[deadline截止追踪]
-
-    TodoSkill --> Redis[(Redis)]
-    RemindSkill --> APScheduler[APScheduler]
-    DeadlineSkill --> Redis
-
-    Bot --> WeatherAPI[天气API]
-    Bot --> LLM[LLM API]
-
-    style User fill:#E8F5E9,stroke:#4CAF50
-    style FeishuAPI fill:#E8F5E9,stroke:#4CAF50
-    style Bot fill:#E3F2FD,stroke:#2196F3
-    style Router fill:#E3F2FD,stroke:#2196F3
-    style IntentEngine fill:#E3F2FD,stroke:#2196F3
-    style ToolRegistry fill:#E3F2FD,stroke:#2196F3
-    style TodoSkill fill:#BBDEFB,stroke:#2196F3
-    style RemindSkill fill:#BBDEFB,stroke:#2196F3
-    style DeadlineSkill fill:#BBDEFB,stroke:#2196F3
-    style Redis fill:#FFF3E0,stroke:#FF9800
-    style APScheduler fill:#FFF3E0,stroke:#FF9800
-    style WeatherAPI fill:#F3E5F5,stroke:#9C27B0
-    style LLM fill:#F3E5F5,stroke:#9C27B0
-    </pre>
-  </div>
-</section>
-
-<!-- Plugin Architecture Section -->
-<section class="section" id="plugin">
-  <div class="section-header reveal">
-    <span class="section-badge">架构亮点</span>
-    <h2 class="section-title">插件化架构</h2>
-    <p class="section-desc">基于 Hermes Agent 的 Skill 插件机制</p>
-  </div>
-  <div class="mermaid-container reveal">
-    <pre class="mermaid">
-graph LR
-    Core[核心引擎] -->|加载| PluginLoader[插件加载器]
-    PluginLoader -->|注册| EventBus[事件总线]
-    EventBus --> Interface[Skill接口]
-    Interface --> Register[register]
-    Interface --> Execute[execute]
-    Interface --> Validate[validate]
-
-    Register --> S1[todo_skill]
-    Register --> S2[remind_skill]
-    Register --> S3[deadline_skill]
-    Register --> S4[weather_skill]
-    Register --> S5[report_skill]
-
-    style Core fill:#E3F2FD,stroke:#2196F3
-    style PluginLoader fill:#E3F2FD,stroke:#2196F3
-    style EventBus fill:#E3F2FD,stroke:#2196F3
-    style Interface fill:#E8F5E9,stroke:#4CAF50
-    style Register fill:#E8F5E9,stroke:#4CAF50
-    style Execute fill:#E8F5E9,stroke:#4CAF50
-    style Validate fill:#E8F5E9,stroke:#4CAF50
-    style S1 fill:#FFF3E0,stroke:#FF9800
-    style S2 fill:#FFF3E0,stroke:#FF9800
-    style S3 fill:#FFF3E0,stroke:#FF9800
-    style S4 fill:#FFF3E0,stroke:#FF9800
-    style S5 fill:#FFF3E0,stroke:#FF9800
-    </pre>
-  </div>
-</section>
-
-<!-- Features Section -->
-<section class="section" id="features">
-  <div class="section-header reveal">
-    <span class="section-badge">核心功能</span>
-    <h2 class="section-title">功能模块</h2>
-    <p class="section-desc">三大核心 Skills + 信息聚合推送</p>
-  </div>
-  <div class="features-grid">
-    <div class="feature-card reveal">
-      <div class="feature-icon">✅</div>
-      <h3>/todo 任务管理</h3>
-      <p>创建待办任务，支持自然语言解析时间。"明天下午3点提醒我开会" 自动解析为具体时间，集成 APScheduler 定时提醒。</p>
+  <div class="toolchain-grid">
+    <div class="tool-card claude reveal">
+      <div class="tool-icon amber">🟠</div>
+      <h3>Claude（Anthropic）</h3>
+      <div class="tool-sub">主力代码模型</div>
+      <p>日常开发首选。Claude Code（ACP）作为独立编码代理，完成从零搭项目到复杂调试的全流程。擅长架构设计、代码重构、跨文件协作。</p>
+      <div class="tool-tags">
+        <span class="tool-tag">Claude Code</span>
+        <span class="tool-tag">Sonnet 4</span>
+        <span class="tool-tag">ACP 协议</span>
+        <span class="tool-tag">代码生成</span>
+      </div>
     </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">⏰</div>
-      <h3>/remind 定时提醒</h3>
-      <p>设置定时提醒，支持一次性提醒和周期性提醒。集成 Redis 持久化存储，确保提醒不丢失。</p>
+    <div class="tool-card hermes reveal">
+      <div class="tool-icon purple">🟣</div>
+      <h3>Hermes Agent</h3>
+      <div class="tool-sub">日常 AI 助手 · 终端搭档</div>
+      <p>CLI 驱动的 AI Agent，支持工具调用、自定义 Skills、多模态。日常用它完成：文件编辑、代码审查、Git 管理、文档编写、浏览器自动操作。</p>
+      <div class="tool-tags">
+        <span class="tool-tag">工具调用</span>
+        <span class="tool-tag">Custom Skills</span>
+        <span class="tool-tag">终端 Agent</span>
+        <span class="tool-tag">持久记忆</span>
+      </div>
     </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">📅</div>
-      <h3>/deadline 截止追踪</h3>
-      <p>追踪任务截止日期，自动汇总本周待办。支持按优先级排序，临近截止自动升级提醒频率。</p>
+    <div class="tool-card deepseek reveal">
+      <div class="tool-icon blue">🔵</div>
+      <h3>DeepSeek V4</h3>
+      <div class="tool-sub">中文长文本 · 国产最优</div>
+      <p>长文本处理的主选模型，在中文语境下表现突出。用于日志分析、安全审计、合规报告生成等需要处理大量中文技术文档的场景。</p>
+      <div class="tool-tags">
+        <span class="tool-tag">长上下文</span>
+        <span class="tool-tag">中文优化</span>
+        <span class="tool-tag">日志分析</span>
+        <span class="tool-tag">Raytoken</span>
+      </div>
     </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">📰</div>
-      <h3>每日早报推送</h3>
-      <p>自动汇总天气、日程、待办，每日早晨定时推送。集成外部 API 数据源，减少重复性人工操作。</p>
+    <div class="tool-card tools reveal">
+      <div class="tool-icon green">🟢</div>
+      <h3>Agent 框架实战</h3>
+      <div class="tool-sub">不止用，还能造</div>
+      <p>深度使用多个 Agent 框架：Hermes Agent（终端）、Claude Code（ACP 编码代理）、OpenCode（开源替代）。理解 Agent 内部机制——工具调用、持久记忆、Skill 系统。</p>
+      <div class="tool-tags">
+        <span class="tool-tag">Hermes</span>
+        <span class="tool-tag">Claude Code</span>
+        <span class="tool-tag">OpenCode</span>
+        <span class="tool-tag">工具注册</span>
+      </div>
     </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">📊</div>
-      <h3>周报自动生成</h3>
-      <p>汇总本周完成任务与下周计划，自动生成周报。支持自定义模板，一键导出为文档。</p>
+    <div class="tool-card prompt reveal">
+      <div class="tool-icon pink">🩷</div>
+      <h3>Prompt Engineering</h3>
+      <div class="tool-sub">精准控制 LLM 输出</div>
+      <p>从 System Prompt 设计到 Few-shot 示例，从结构化输出到 Chain-of-Thought。在实际项目中反复调优——LLM JSON 截断恢复、Markdown 剥离、温度控制、输出格式约束。</p>
+      <div class="tool-tags">
+        <span class="tool-tag">Few-shot</span>
+        <span class="tool-tag">CoT</span>
+        <span class="tool-tag">Structured Output</span>
+        <span class="tool-tag">Prompt 模板</span>
+      </div>
     </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">🔌</div>
-      <h3>插件化架构</h3>
-      <p>基于 Hermes Agent 的 Skill 插件机制，各功能模块独立开发、测试与扩展。新功能开发周期从 2 天缩短至半天。</p>
+    <div class="tool-card rag reveal">
+      <div class="tool-icon orange">🟠</div>
+      <h3>RAG 与知识库</h3>
+      <div class="tool-sub">让 AI 拥有领域知识</div>
+      <p>在项目中实践 RAG（检索增强生成）：ChromaDB 向量存储、Embedding 检索、上下文注入。在安全溯源项目中，用 RAG 让 LLM 理解攻击手法库。</p>
+      <div class="tool-tags">
+        <span class="tool-tag">ChromaDB</span>
+        <span class="tool-tag">Vector Search</span>
+        <span class="tool-tag">Embedding</span>
+        <span class="tool-tag">检索增强</span>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Skills Table Section -->
+<!-- Workflow -->
+<section class="section" id="workflow">
+  <div class="section-header reveal">
+    <span class="section-badge">我的 AI 工作流</span>
+    <h2 class="section-title">AI 如何嵌入 <span class="accent">开发全流程</span></h2>
+    <p class="section-desc">不是阶段性地"用 AI 写代码"，而是每个环节都有不同的 AI 工具介入</p>
+  </div>
+  <div class="workflow-container reveal">
+    <div class="workflow-flow">
+      <div class="wf-node">
+        <div class="wf-node-icon">💡</div>
+        <div class="wf-node-label">需求分析</div>
+        <div class="wf-sub">Claude · 澄清分解</div>
+      </div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node">
+        <div class="wf-node-icon">📐</div>
+        <div class="wf-node-label">架构设计</div>
+        <div class="wf-sub">Claude + Hermes</div>
+      </div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node">
+        <div class="wf-node-icon">⌨️</div>
+        <div class="wf-node-label">编码实现</div>
+        <div class="wf-sub">Claude Code / Agent</div>
+      </div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node">
+        <div class="wf-node-icon">🔍</div>
+        <div class="wf-node-label">代码审查</div>
+        <div class="wf-sub">Hermes Agent</div>
+      </div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node">
+        <div class="wf-node-icon">🧪</div>
+        <div class="wf-node-label">测试验证</div>
+        <div class="wf-sub">AI 生成测试</div>
+      </div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node">
+        <div class="wf-node-icon">📝</div>
+        <div class="wf-node-label">文档</div>
+        <div class="wf-sub">Agent 自动产出</div>
+      </div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-node">
+        <div class="wf-node-icon">🚀</div>
+        <div class="wf-node-label">部署运维</div>
+        <div class="wf-sub">Agent + Shell</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Practical Examples -->
+<section class="section" id="examples">
+  <div class="section-header reveal">
+    <span class="section-badge">真实案例</span>
+    <h2 class="section-title">实践 <span class="accent">案例</span></h2>
+    <p class="section-desc">不只是说"我会用 AI"，而是展示具体怎么用、解决了什么问题</p>
+  </div>
+
+  <div class="examples-grid">
+    <div class="example-card reveal">
+      <div class="example-header">
+        <div class="example-avatar claude">🗣️</div>
+        <div>
+          <div class="example-name">Claude Code 全流程开发</div>
+          <div class="example-role">驱动一个 6 模块 FastAPI 项目从零到发布</div>
+        </div>
+      </div>
+      <div class="example-desc">
+        通过 Claude Code（ACP 协议）代理完成 <code>日志溯源卫士智能体</code> 的全部模块开发。从架构设计、策略工厂模式搭建、16 条攻击链规则编写，到前端 Vue3 SPA 页面、API 测试，整个项目接近完全由 Claude Code 编写代码。
+      </div>
+      <div class="example-tags">
+        <span class="example-tag">Claude Code</span>
+        <span class="example-tag">ACP</span>
+        <span class="example-tag">FastAPI</span>
+        <span class="example-tag">全栈</span>
+      </div>
+    </div>
+    <div class="example-card reveal">
+      <div class="example-header">
+        <div class="example-avatar hermes">🤖</div>
+        <div>
+          <div class="example-name">Hermes Agent 日常开发助手</div>
+          <div class="example-role">终端里的 AI 搭档，覆盖编码到运维</div>
+        </div>
+      </div>
+      <div class="example-desc">
+        Hermes Agent 作为每日开发伴侣：用 <code>patch</code> 精确替换代码、<code>terminal</code> 执行命令、<code>browser</code> 测试前端页面、<code>search_files</code> 快速定位代码、<code>memory</code> 持久化项目上下文。编写 Custom Skills 记录常见工作流，下次直接复用。
+      </div>
+      <div class="example-tags">
+        <span class="example-tag">Custom Skills</span>
+        <span class="example-tag">终端 Agent</span>
+        <span class="example-tag">持久记忆</span>
+        <span class="example-tag">工具链</span>
+      </div>
+    </div>
+    <div class="example-card reveal">
+      <div class="example-header">
+        <div class="example-avatar hermes">🧠</div>
+        <div>
+          <div class="example-name">LLM JSON 截断恢复</div>
+          <div class="example-role">让 LLM 输出从来不崩的实战方案</div>
+        </div>
+      </div>
+      <div class="example-desc">
+        在安全溯源项目中，LLM 返回 JSON 经常被截断。设计了 <strong>4 层恢复策略</strong>：直接解析 → 括号补全 → <code>raw_decode</code> 流式抽取 → 正则片段提取。从"10 次有 3 次崩"到"零失败"。这个方案已写成 Skill 供后续项目复用。
+      </div>
+      <div class="example-tags">
+        <span class="example-tag">Prompt Engineering</span>
+        <span class="example-tag">容错</span>
+        <span class="example-tag">JSON 解析</span>
+        <span class="example-tag">鲁棒性</span>
+      </div>
+    </div>
+    <div class="example-card reveal">
+      <div class="example-header">
+        <div class="example-avatar deepseek">🔧</div>
+        <div>
+          <div class="example-name">两阶段分析引擎设计</div>
+          <div class="example-role">关键词 + LLM 混合，性能与智能兼得</div>
+        </div>
+      </div>
+      <div class="example-desc">
+        不要每行日志都调 LLM——这是常识，但怎么设计降级策略不是。设计了两阶段引擎：<code>关键词正则</code> 毫秒级预过滤 → 命中即返回（零 API 成本）→ 漏报才走 <code>一次 LLM 调用</code> 分析全部日志。再加混合模式：两者同时跑，按 <code>chain_name</code> 去重合并。
+      </div>
+      <div class="example-tags">
+        <span class="example-tag">混合架构</span>
+        <span class="example-tag">性能优化</span>
+        <span class="example-tag">关键词+LLM</span>
+        <span class="example-tag">降级策略</span>
+      </div>
+    </div>
+    <div class="example-card reveal">
+      <div class="example-header">
+        <div class="example-avatar claude">📋</div>
+        <div>
+          <div class="example-name">Agent Skill 编写与管理</div>
+          <div class="example-role">把重复工作固化为可复用的技能</div>
+        </div>
+      </div>
+      <div class="example-desc">
+        每次解决一个复杂问题（5+ 工具调用），就把它写成 <code>Skill</code>——从测试工作流到浏览器自动化，从 CLI 代码审查到模块开发模板。Skill 是"可执行的记忆"：包含触发条件、步骤流程、常见陷阱、验证清单。下次遇到同样问题，Agent 自动加载。
+      </div>
+      <div class="example-tags">
+        <span class="example-tag">Skill 系统</span>
+        <span class="example-tag">知识沉淀</span>
+        <span class="example-tag">可复用</span>
+        <span class="example-tag">自动化</span>
+      </div>
+    </div>
+    <div class="example-card reveal">
+      <div class="example-header">
+        <div class="example-avatar hermes">🔄</div>
+        <div>
+          <div class="example-name">多 Agent 协作</div>
+          <div class="example-role">并行子任务 + 结果汇总</div>
+        </div>
+      </div>
+      <div class="example-desc">
+        大型任务分解为并行子任务交给多个 Agent 同时执行。例如：同时审查 6 个模块、并行搜索多个技术方案、同时验证多端页面。每个子 Agent 独立上下文，最终汇总结果。理解 Agent 的 <code>delegate_task</code> 机制和上下文隔离。
+      </div>
+      <div class="example-tags">
+        <span class="example-tag">并行 Agent</span>
+        <span class="example-tag">任务分解</span>
+        <span class="example-tag">上下文隔离</span>
+        <span class="example-tag">子任务</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Prompt Gallery -->
 <section class="section">
   <div class="section-header reveal">
-    <span class="section-badge">技术实现</span>
-    <h2 class="section-title">Skills 开发详情</h2>
-    <p class="section-desc">自定义 Skills 的触发方式与实现逻辑</p>
+    <span class="section-badge">Prompt 呈现</span>
+    <h2 class="section-title">真实 <span class="accent">Prompt 片段</span></h2>
+    <p class="section-desc">从实际项目中摘取的 Prompt 设计——不是"咒语"，是可复用的工程实践</p>
   </div>
-  <table class="skills-table reveal">
-    <thead>
-      <tr>
-        <th>Skill</th>
-        <th>功能</th>
-        <th>触发方式</th>
-        <th>技术实现</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><code>/todo</code></td>
-        <td>创建待办任务</td>
-        <td>"明天下午3点提醒我开会"</td>
-        <td><span class="skill-tag">NLP 时间解析</span><span class="skill-tag">Redis 存储</span></td>
-      </tr>
-      <tr>
-        <td><code>/remind</code></td>
-        <td>设置定时提醒</td>
-        <td>"提醒我周五交周报"</td>
-        <td><span class="skill-tag">APScheduler</span><span class="skill-tag">飞书消息</span></td>
-      </tr>
-      <tr>
-        <td><code>/deadline</code></td>
-        <td>截止日期追踪</td>
-        <td>"查看本周截止的任务"</td>
-        <td><span class="skill-tag">时间过滤</span><span class="skill-tag">优先级排序</span></td>
-      </tr>
-    </tbody>
-  </table>
+
+  <div class="prompt-card reveal">
+    <div class="prompt-meta">
+      <span class="prompt-model claude">Claude Code</span>
+      <span class="prompt-type">系统提示 · 结构化输出约束</span>
+    </div>
+    <div class="prompt-content">
+<span class="highlight-blue">输出要求</span>：<br>
+- 每个攻击链必须包含：chain_name, description, risk_level, confidence<br>
+- <span class="highlight-pink">confidence 取值范围 0.0-1.0</span>，基于日志证据链的完整性<br>
+- <span class="highlight-green">宽松判断</span>：只要日志中存在至少 2 个阶段特征就应报告<br>
+- 输出必须是<span class="highlight-pink">纯 JSON</span>，不要用 markdown 包裹<br>
+- 已知攻击链候选（16 种）：ssh_brute_to_privesc, sql_injection_chain, ...
+    </div>
+  </div>
+
+  <div class="prompt-card reveal">
+    <div class="prompt-meta">
+      <span class="prompt-model hermes">Hermes Agent</span>
+      <span class="prompt-type">Skill · 模块开发模板</span>
+    </div>
+    <div class="prompt-content">
+<span class="highlight-blue">触发条件</span>：用户要求开发新的 FastAPI 模块<br>
+<span class="highlight-green">执行顺序</span>：<br>
+1. 读取设计文档 → 提取接口规范<br>
+2. 读取 module 4 (script_gen) 作为风格参考<br>
+3. 先建 JSON 配置文件（零硬编码）<br>
+4. 按顺序创建 5 个文件：<span class="highlight-pink">schemas → strategy → service → router → __init__</span><br>
+5. 拼接 app/main.py 注册路由<br>
+6. 验证：ast.parse() + json.load() + route inspection
+    </div>
+  </div>
 </section>
 
-<!-- Code Example Section -->
+<!-- Capability Matrix -->
+<section class="section" id="skills">
+  <div class="section-header reveal">
+    <span class="section-badge">能力矩阵</span>
+    <h2 class="section-title">AI 相关 <span class="accent">能力评级</span></h2>
+    <p class="section-desc">不是糊弄人的进度条，而是基于真实项目经验的自我评估</p>
+  </div>
+  <div class="matrix-grid">
+    <div class="matrix-card reveal">
+      <div class="matrix-icon">🟠</div>
+      <div class="matrix-label">Claude Code</div>
+      <div class="matrix-level"><div class="matrix-fill" style="width:95%"></div></div>
+      <div style="font-size:0.7rem;color:var(--text-light);margin-top:6px">深度使用 · 全流程驱动</div>
+    </div>
+    <div class="matrix-card reveal">
+      <div class="matrix-icon">🟣</div>
+      <div class="matrix-label">Hermes Agent</div>
+      <div class="matrix-level"><div class="matrix-fill" style="width:90%"></div></div>
+      <div style="font-size:0.7rem;color:var(--text-light);margin-top:6px">日常工具 · 自建 Skills</div>
+    </div>
+    <div class="matrix-card reveal">
+      <div class="matrix-icon">🔵</div>
+      <div class="matrix-label">Prompt Engineering</div>
+      <div class="matrix-level"><div class="matrix-fill" style="width:88%"></div></div>
+      <div style="font-size:0.7rem;color:var(--text-light);margin-top:6px">结构化 · Few-shot · 容错</div>
+    </div>
+    <div class="matrix-card reveal">
+      <div class="matrix-icon">🟢</div>
+      <div class="matrix-label">RAG / 向量检索</div>
+      <div class="matrix-level"><div class="matrix-fill" style="width:75%"></div></div>
+      <div style="font-size:0.7rem;color:var(--text-light);margin-top:6px">ChromaDB · 知识库构建</div>
+    </div>
+    <div class="matrix-card reveal">
+      <div class="matrix-icon">🩷</div>
+      <div class="matrix-label">Agent 框架原理</div>
+      <div class="matrix-level"><div class="matrix-fill" style="width:82%"></div></div>
+      <div style="font-size:0.7rem;color:var(--text-light);margin-top:6px">工具调用 · 记忆 · Skill</div>
+    </div>
+    <div class="matrix-card reveal">
+      <div class="matrix-icon">🟠</div>
+      <div class="matrix-label">LLM API 集成</div>
+      <div class="matrix-level"><div class="matrix-fill" style="width:85%"></div></div>
+      <div style="font-size:0.7rem;color:var(--text-light);margin-top:6px">多 Provider · 容错 · 流式</div>
+    </div>
+    <div class="matrix-card reveal">
+      <div class="matrix-icon">🔵</div>
+      <div class="matrix-label">多 Agent 协作</div>
+      <div class="matrix-level"><div class="matrix-fill" style="width:70%"></div></div>
+      <div style="font-size:0.7rem;color:var(--text-light);margin-top:6px">任务分解 · 并行调度</div>
+    </div>
+    <div class="matrix-card reveal">
+      <div class="matrix-icon">🟣</div>
+      <div class="matrix-label">AI 工具生态</div>
+      <div class="matrix-level"><div class="matrix-fill" style="width:80%"></div></div>
+      <div style="font-size:0.7rem;color:var(--text-light);margin-top:6px">模型对比 · 选型判断</div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack -->
+<section class="section" id="stack">
+  <div class="section-header reveal">
+    <span class="section-badge">技术栈</span>
+    <h2 class="section-title">使用过的 <span class="accent">模型与工具</span></h2>
+    <p class="section-desc">覆盖主流 AI 模型、Agent 框架、向量数据库、开发工具</p>
+  </div>
+  <div class="tech-grid">
+    <div class="tech-item reveal">
+      <div class="tech-icon">🟠</div>
+      <div><div class="tech-name">Claude</div><div class="tech-desc">Sonnet 4 · Opus · Claude Code</div></div>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">🟣</div>
+      <div><div class="tech-name">Hermes Agent</div><div class="tech-desc">NousResearch · CLI Agent</div></div>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">🔵</div>
+      <div><div class="tech-name">DeepSeek</div><div class="tech-desc">V4 Flash · 中文长文本</div></div>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">🟢</div>
+      <div><div class="tech-name">OpenCode</div><div class="tech-desc">开源编码 Agent</div></div>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">🟡</div>
+      <div><div class="tech-name">GPT-4o</div><div class="tech-desc">多模态 · 通用</div></div>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">🔴</div>
+      <div><div class="tech-name">ChromaDB</div><div class="tech-desc">向量数据库 · RAG</div></div>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">🩷</div>
+      <div><div class="tech-name">OpenAI API</div><div class="tech-desc">多种 Provider</div></div>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">⚙️</div>
+      <div><div class="tech-name">Model Context Protocol</div><div class="tech-desc">MCP · 工具标准化</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Metrics -->
 <section class="section">
   <div class="section-header reveal">
-    <span class="section-badge">代码示例</span>
-    <h2 class="section-title">核心代码</h2>
-    <p class="section-desc">自定义 Skills 实现示例</p>
-  </div>
-  <div class="code-block reveal">
-    <span class="comment"># /todo 任务创建 Skill</span><br>
-    <span class="keyword">@skill</span>(<span class="string">"/todo"</span>)<br>
-    <span class="keyword">def</span> <span class="function">create_todo</span>(user_id: str, task: str, due_date: str = <span class="keyword">None</span>):<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"""创建待办任务，支持自然语言解析时间"""</span><br>
-    &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># "明天下午3点提醒我开会" → 解析为具体时间</span><br>
-    &nbsp;&nbsp;&nbsp;&nbsp;parsed_time = parse_natural_time(due_date)<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;redis_client.hset(<span class="string">f"todo:{user_id}"</span>, task, parsed_time)<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="string">f"已创建待办：{task}，截止时间：{parsed_time}"</span><br><br>
-
-    <span class="comment"># /remind 定时提醒 Skill</span><br>
-    <span class="keyword">@skill</span>(<span class="string">"/remind"</span>)<br>
-    <span class="keyword">def</span> <span class="function">set_reminder</span>(user_id: str, message: str, time: str):<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"""设置定时提醒，集成 APScheduler"""</span><br>
-    &nbsp;&nbsp;&nbsp;&nbsp;scheduler.add_job(<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;send_reminder,<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">'date'</span>,<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;run_date=time,<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;args=[user_id, message]<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;)<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="string">f"已设置提醒：{message}，时间：{time}"</span>
-  </div>
-</section>
-
-<!-- Metrics Section -->
-<section class="section" id="metrics">
-  <div class="section-header reveal">
-    <span class="section-badge">项目数据</span>
-    <h2 class="section-title">核心指标</h2>
-    <p class="section-desc">项目关键数据一览</p>
+    <span class="section-badge">量化</span>
+    <h2 class="section-title">AI 使用 <span class="accent">数据</span></h2>
+    <p class="section-desc">基于真实项目积累的 AI 使用指标</p>
   </div>
   <div class="metrics-grid">
     <div class="metric-card reveal">
-      <div class="metric-value" data-target="50">0</div>
-      <div class="metric-label">日均对话请求</div>
+      <div class="metric-value" data-target="5000">0+</div>
+      <div class="metric-label">AI 辅助代码行数</div>
+      <div class="metric-sub">日志溯源卫士项目</div>
     </div>
     <div class="metric-card reveal">
-      <div class="metric-value" data-target="3">0</div>
-      <div class="metric-label">自定义 Skills</div>
+      <div class="metric-value">15+</div>
+      <div class="metric-label">自建 Skills</div>
+      <div class="metric-sub">可复用工作流</div>
     </div>
     <div class="metric-card reveal">
-      <div class="metric-value">0.5天</div>
-      <div class="metric-label">新功能开发周期</div>
+      <div class="metric-value" data-target="6">0</div>
+      <div class="metric-label">AI 集成项目</div>
+      <div class="metric-sub">从 Agent 到 RAG</div>
     </div>
     <div class="metric-card reveal">
-      <div class="metric-value">24/7</div>
-      <div class="metric-label">服务可用性</div>
-    </div>
-  </div>
-</section>
-
-<!-- Challenges Section -->
-<section class="section">
-  <div class="section-header reveal">
-    <span class="section-badge">技术挑战</span>
-    <h2 class="section-title">挑战与解决方案</h2>
-    <p class="section-desc">开发过程中遇到的关键问题</p>
-  </div>
-  <div class="accordion">
-    <div class="accordion-item reveal">
-      <div class="accordion-header">
-        <span>自然语言时间解析</span>
-        <span class="icon">▼</span>
-      </div>
-      <div class="accordion-content">
-        <div class="accordion-content-inner">
-          <p><strong>问题：</strong>用户输入"明天下午3点"、"下周五"、"3天后"等多样化时间表达，需要准确解析为具体时间。</p>
-          <p><strong>方案：</strong>集成 NLP 时间解析库，结合正则匹配和语义理解，支持相对时间、绝对时间、模糊时间等多种表达方式。解析失败时回退到用户确认流程。</p>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item reveal">
-      <div class="accordion-header">
-        <span>飞书消息格式适配</span>
-        <span class="icon">▼</span>
-      </div>
-      <div class="accordion-content">
-        <div class="accordion-content-inner">
-          <p><strong>问题：</strong>飞书消息支持多种格式（文本、卡片、富文本），不同场景需要选择合适的格式。</p>
-          <p><strong>方案：</strong>设计消息格式策略，简单回复用文本，结构化数据用卡片，长文本用富文本。通过装饰器模式统一消息发送接口。</p>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item reveal">
-      <div class="accordion-header">
-        <span>定时任务可靠性</span>
-        <span class="icon">▼</span>
-      </div>
-      <div class="accordion-content">
-        <div class="accordion-content-inner">
-          <p><strong>问题：</strong>APScheduler 默认内存存储，服务重启后定时任务丢失。</p>
-          <p><strong>方案：</strong>将定时任务持久化到 Redis，服务启动时从 Redis 恢复任务。实现任务执行幂等性，防止重复执行。</p>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item reveal">
-      <div class="accordion-header">
-        <span>多群聊上下文隔离</span>
-        <span class="icon">▼</span>
-      </div>
-      <div class="accordion-content">
-        <div class="accordion-content-inner">
-          <p><strong>问题：</strong>机器人同时服务多个群聊，需要隔离不同群的上下文和数据。</p>
-          <p><strong>方案：</strong>以 <code>chat_id</code> 作为隔离键，Redis Hash 存储各群独立的待办、提醒等数据。会话状态通过 <code>user_id + chat_id</code> 组合键管理。</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Tech Stack Section -->
-<section class="section" id="tech">
-  <div class="section-header reveal">
-    <span class="section-badge">技术栈</span>
-    <h2 class="section-title">技术选型</h2>
-    <p class="section-desc">项目使用的核心技术</p>
-  </div>
-  <div class="features-grid">
-    <div class="feature-card reveal">
-      <div class="feature-icon">🐍</div>
-      <h3>Python</h3>
-      <p>主要开发语言，用于 Agent 开发、Skills 实现、API 对接</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">🤖</div>
-      <h3>Hermes Agent</h3>
-      <p>NousResearch 开源 Agent 框架，提供工具调用、对话管理等能力</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">💬</div>
-      <h3>飞书开放平台</h3>
-      <p>飞书 API 对接，实现消息收发、群聊管理、用户认证</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">⏰</div>
-      <h3>APScheduler</h3>
-      <p>Python 定时任务框架，支持一次性任务和周期性任务</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">🗄️</div>
-      <h3>Redis</h3>
-      <p>数据持久化存储，存储待办、提醒、会话状态等数据</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon">🔌</div>
-      <h3>hermes-feishu</h3>
-      <p>飞书插件，封装飞书 API 调用，简化消息收发流程</p>
+      <div class="metric-value">4 层</div>
+      <div class="metric-label">LLM 容错策略</div>
+      <div class="metric-sub">JSON 截断恢复</div>
     </div>
   </div>
 </section>
 
 <!-- Footer -->
 <footer class="footer">
-  <p>© 2026 张雯炫 · 飞书 AI 智能助手作品集</p>
-  <p style="margin-top: 8px;"><a href="../index.html" style="color: var(--primary); text-decoration: none;">← 返回后端 & AI 作品集</a></p>
+  <p>© 2026 张雯炫 · AI 增强开发能力图谱</p>
+  <p style="margin-top:6px;"><a href="./index.html">← 返回作品集首页</a></p>
 </footer>
 
-<!-- Back to Top -->
 <button class="back-to-top" id="backToTop">↑</button>
 
 <script>
-// ===== Mermaid Init =====
-mermaid.initialize({
-  startOnLoad: true,
-  theme: 'default',
-  securityLevel: 'loose',
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif',
-  flowchart: {
-    useMaxWidth: true,
-    htmlLabels: true,
-    curve: 'basis'
-  }
-});
-
 // ===== Counter Animation =====
 function animateCounters() {
-  const counters = document.querySelectorAll('.stat-number[data-target], .metric-value[data-target]');
-  counters.forEach(counter => {
+  document.querySelectorAll('.metric-value[data-target]').forEach(counter => {
     const target = parseInt(counter.getAttribute('data-target'));
-    const duration = 2000;
-    const increment = target / (duration / 16);
-    let current = 0;
-
-    const updateCounter = () => {
-      current += increment;
-      if (current < target) {
-        counter.textContent = Math.floor(current);
-        requestAnimationFrame(updateCounter);
-      } else {
-        counter.textContent = target;
-      }
-    };
-    updateCounter();
+    const duration = 1500;
+    const start = performance.now();
+    function update(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      counter.textContent = Math.floor(target * (1 - Math.pow(1 - progress, 3)));
+      if (progress < 1) requestAnimationFrame(update);
+      else counter.textContent = target;
+    }
+    requestAnimationFrame(update);
   });
 }
-
-// ===== Accordion =====
-document.querySelectorAll('.accordion-header').forEach(header => {
-  header.addEventListener('click', () => {
-    const item = header.parentElement;
-    const content = item.querySelector('.accordion-content');
-    const isActive = item.classList.contains('active');
-
-    // Close all
-    document.querySelectorAll('.accordion-item').forEach(i => {
-      i.classList.remove('active');
-      i.querySelector('.accordion-content').style.maxHeight = '0';
-    });
-
-    // Open clicked
-    if (!isActive) {
-      item.classList.add('active');
-      content.style.maxHeight = content.scrollHeight + 'px';
-    }
-  });
-});
 
 // ===== Reveal Animation =====
 const observer = new IntersectionObserver((entries) => {
@@ -859,11 +1194,34 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// ===== Back to Top =====
+// ===== Scroll Handlers =====
 const backToTop = document.getElementById('backToTop');
+const mainNav = document.getElementById('mainNav');
+const scrollProgress = document.getElementById('scrollProgress');
+
 window.addEventListener('scroll', () => {
-  backToTop.classList.toggle('visible', window.scrollY > 500);
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+  // Scroll progress
+  scrollProgress.style.width = (scrollTop / docHeight * 100) + '%';
+
+  // Back to top
+  backToTop.classList.toggle('visible', scrollTop > 500);
+
+  // Nav scrolled
+  mainNav.classList.toggle('scrolled', scrollTop > 50);
+
+  // Nav highlight
+  const navLinks = document.querySelectorAll('.nav-links a');
+  navLinks.forEach(a => {
+    const section = document.querySelector(a.getAttribute('href'));
+    if (section) {
+      a.style.color = (scrollTop >= section.offsetTop - 200) ? '#6366F1' : '#6B7280';
+    }
+  });
 });
+
 backToTop.addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });

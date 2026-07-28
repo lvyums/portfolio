@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>张雯炫 — 日志溯源卫士 · 中安发研究院实习</title>
+<style>
+/* ===== Reset & Variables ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg-primary: #0a0e17;
+  --bg-secondary: #0f1520;
+  --bg-card: rgba(15, 21, 32, 0.8);
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --text-primary: #e8edf5;
+  --text-secondary: #8892a8;
+  --text-dim: #556072;
+  --accent-green: #00ff88;
+  --accent-cyan: #00ccff;
+  --accent-blue: #0088ff;
+  --accent-purple: #8844ff;
+  --accent-orange: #ff8800;
+  --accent-red: #ff3366;
+  --border: rgba(255,255,255,0.06);
+  --border-glow: rgba(0,255,136,0.15);
+  --glow-green: 0 0 20px rgba(0,255,136,0.15);
+  --glow-blue: 0 0 20px rgba(0,136,255,0.15);
+  --radius: 12px;
+  --radius-lg: 20px;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", monospace;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ===== Matrix Rain Background ===== */
+#matrixCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+/* ===== Scanlines Overlay ===== */
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,255,136,0.008) 2px,
+    rgba(0,255,136,0.008) 4px
+  );
+}
+
+/* ===== Grid Overlay ===== */
+.grid-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ===== Navigation ===== */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(10,14,23,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s;
+}
+nav.scrolled {
+  border-bottom-color: var(--border);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+}
+.nav-logo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-green);
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+.nav-logo::before {
+  content: '>_ ';
+  color: var(--text-dim);
+}
+.nav-links {
+  display: flex;
+  gap: 28px;
+  list-style: none;
+}
+.nav-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.3s;
+  position: relative;
+  padding-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent-green);
+  transition: width 0.3s;
+}
+.nav-links a:hover { color: var(--accent-green); }
+.nav-links a:hover::after { width: 100%; }
+
+/* ===== Hero ===== */
+.hero {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 0 10%;
+}
+.hero-content {
+  max-width: 900px;
+  width: 100%;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border: 1px solid var(--border-glow);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--accent-green);
+  margin-bottom: 24px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(0,255,136,0.04);
+}
+.hero-badge .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  animation: blink-dot 1.5s infinite;
+}
+@keyframes blink-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.hero h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.hero h1 .highlight-green {
+  background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero h1 .highlight-blue {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== Terminal Hero ===== */
+.terminal-hero {
+  margin: 28px 0 20px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(0,255,136,0.12);
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: 'Menlo', 'Consolas', 'Courier New', monospace;
+}
+.terminal-titlebar {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid rgba(0,255,136,0.08);
+  gap: 8px;
+}
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.terminal-dot.red { background: #ff5f56; }
+.terminal-dot.yellow { background: #ffbd2e; }
+.terminal-dot.green { background: #27c93f; }
+.terminal-title {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-left: 8px;
+  letter-spacing: 0.5px;
+}
+.terminal-body {
+  padding: 20px 24px;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+.terminal-line {
+  opacity: 0;
+  animation: typeLine 0.05s forwards;
+}
+.terminal-line .prompt { color: var(--accent-green); }
+.terminal-line .cmd { color: #e8edf5; }
+.terminal-line .output { color: var(--text-secondary); }
+.terminal-line .highlight { color: var(--accent-cyan); }
+.terminal-line .success { color: var(--accent-green); }
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: var(--accent-green);
+  animation: blink-cursor 0.8s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 2px;
+}
+@keyframes blink-cursor { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+@keyframes typeLine {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.hero-stats {
+  display: flex;
+  gap: 48px;
+  margin-top: 36px;
+}
+.stat-item { text-align: center; }
+.stat-num {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--accent-green);
+  display: block;
+  line-height: 1;
+  font-family: 'Menlo', 'Consolas', monospace;
+}
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-top: 6px;
+  letter-spacing: 0.5px;
+}
+
+/* ===== Section Common ===== */
+.section {
+  position: relative;
+  z-index: 2;
+  padding: 100px 10%;
+}
+.section-header {
+  margin-bottom: 60px;
+}
+.section-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  color: var(--accent-green);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  font-family: 'Menlo', 'Consolas', monospace;
+}
+.section-tag::before { content: '// '; color: var(--text-dim); }
+.section-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.section-title .accent { color: var(--accent-green); }
+.section-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin-top: 12px;
+}
+
+/* ===== Architecture Diagram ===== */
+.arch-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 50px 40px;
+  backdrop-filter: blur(10px);
+}
+.arch-title {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 40px;
+  font-family: 'Menlo', 'Consolas', monospace;
+  letter-spacing: 2px;
+}
+.arch-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+}
+.arch-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 18px;
+  background: rgba(0,255,136,0.03);
+  border: 1px solid rgba(0,255,136,0.08);
+  border-radius: var(--radius);
+  min-width: 90px;
+  transition: all 0.3s;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.arch-node.visible { opacity: 1; transform: translateY(0); }
+.arch-node:hover {
+  border-color: rgba(0,255,136,0.25);
+  background: rgba(0,255,136,0.06);
+  box-shadow: var(--glow-green);
+}
+.arch-node-icon { font-size: 1.6rem; margin-bottom: 8px; }
+.arch-node-label { font-size: 0.7rem; color: var(--text-secondary); text-align: center; }
+.arch-node .sub-label {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+.arch-arrow {
+  font-size: 1.3rem;
+  color: var(--accent-green);
+  padding: 0 6px;
+  opacity: 0.5;
+}
+
+/* ===== Feature Grid ===== */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.feature-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  transition: all 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.feature-card:hover::before { opacity: 1; }
+.feature-card:hover {
+  border-color: rgba(0,255,136,0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+.feature-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin-bottom: 18px;
+}
+.feature-icon.green { background: rgba(0,255,136,0.08); }
+.feature-icon.blue { background: rgba(0,136,255,0.08); }
+.feature-icon.purple { background: rgba(136,68,255,0.08); }
+.feature-icon.orange { background: rgba(255,136,0,0.08); }
+.feature-icon.cyan { background: rgba(0,204,255,0.08); }
+.feature-icon.red { background: rgba(255,51,102,0.08); }
+.feature-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+.feature-card p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.feature-metric {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'Menlo', 'Consolas', monospace;
+  background: rgba(0,255,136,0.06);
+  color: var(--accent-green);
+  border: 1px solid rgba(0,255,136,0.1);
+}
+
+/* ===== Timeline ===== */
+.timeline { position: relative; padding-left: 32px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--accent-green), rgba(0,255,136,0.05));
+}
+.tl-item {
+  position: relative;
+  margin-bottom: 48px;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tl-item.visible { opacity: 1; transform: translateX(0); }
+.tl-dot {
+  position: absolute;
+  left: -26px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  border: 2px solid var(--accent-green);
+  box-shadow: 0 0 0 4px rgba(0,255,136,0.08);
+  transition: all 0.3s;
+}
+.tl-item:hover .tl-dot {
+  background: var(--accent-green);
+  box-shadow: 0 0 0 8px rgba(0,255,136,0.1);
+}
+.tl-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: all 0.3s;
+}
+.tl-card:hover {
+  border-color: rgba(0,255,136,0.12);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.tl-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.tl-title { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+.tl-date {
+  padding: 3px 12px;
+  background: rgba(0,255,136,0.06);
+  border: 1px solid rgba(0,255,136,0.1);
+  border-radius: 4px;
+  font-size: 0.72rem;
+  color: var(--accent-green);
+  font-family: 'Menlo', 'Consolas', monospace;
+  white-space: nowrap;
+}
+.tl-desc { margin-top: 12px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7; }
+.tl-highlights {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tl-highlight {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.tl-highlight .hl-icon { color: var(--accent-green); flex-shrink: 0; margin-top: 2px; }
+.tl-highlight strong { color: var(--text-primary); }
+
+/* ===== Code Snippet ===== */
+.code-snippet {
+  margin: 24px 0 0;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(0,255,136,0.08);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.code-snippet .code-header {
+  padding: 8px 14px;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid rgba(0,255,136,0.06);
+  font-family: 'Menlo', 'Consolas', monospace;
+}
+.code-snippet pre {
+  padding: 14px;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  color: var(--text-secondary);
+  font-family: 'Menlo', 'Consolas', monospace;
+}
+.code-snippet .kw { color: var(--accent-purple); }
+.code-snippet .str { color: var(--accent-green); }
+.code-snippet .fn { color: var(--accent-cyan); }
+.code-snippet .cmt { color: var(--text-dim); font-style: italic; }
+.code-snippet .num { color: var(--accent-orange); }
+
+/* ===== Metrics Dashboard ===== */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.metric-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+  transition: all 0.3s;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.metric-card.visible { opacity: 1; transform: translateY(0); }
+.metric-card:hover {
+  border-color: rgba(0,255,136,0.12);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.metric-icon { font-size: 1.8rem; margin-bottom: 10px; }
+.metric-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'Menlo', 'Consolas', monospace;
+}
+.metric-label { font-size: 0.78rem; color: var(--text-dim); margin-top: 6px; }
+
+/* ===== Tech Stack ===== */
+.tech-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.tech-tag {
+  padding: 6px 16px;
+  background: rgba(0,255,136,0.04);
+  border: 1px solid rgba(0,255,136,0.08);
+  border-radius: 4px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  transition: all 0.3s;
+  font-family: 'Menlo', 'Consolas', monospace;
+}
+.tech-tag:hover {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  background: rgba(0,255,136,0.08);
+  box-shadow: var(--glow-green);
+  transform: translateY(-2px);
+}
+
+/* ===== Divider ===== */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,255,136,0.15), transparent);
+  margin: 0 10%;
+}
+
+/* ===== Footer ===== */
+footer {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 40px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+}
+footer a {
+  color: var(--accent-green);
+  text-decoration: none;
+}
+footer a:hover { text-decoration: underline; }
+
+/* ===== Scroll Progress ===== */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+  z-index: 101;
+  width: 0;
+  transition: width 0.1s;
+}
+
+/* ===== Back to Top ===== */
+.back-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s;
+  z-index: 99;
+  color: var(--accent-green);
+  font-size: 1rem;
+  backdrop-filter: blur(10px);
+}
+.back-top.visible { opacity: 1; transform: translateY(0); }
+.back-top:hover {
+  border-color: var(--accent-green);
+  box-shadow: var(--glow-green);
+}
+
+/* ===== Animations ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fade-in-up.visible { opacity: 1; transform: translateY(0); }
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  nav { padding: 12px 20px; }
+  .nav-links { display: none; }
+  .hero { padding: 120px 6% 60px; }
+  .hero h1 { font-size: 2.2rem; }
+  .hero-stats { gap: 24px; flex-wrap: wrap; }
+  .section { padding: 60px 6%; }
+  .section-title { font-size: 1.8rem; }
+  .features-grid { grid-template-columns: 1fr; }
+  .metrics-grid { grid-template-columns: 1fr 1fr; }
+  .arch-flow { flex-direction: column; }
+  .arch-arrow { transform: rotate(90deg); padding: 4px 0; }
+  .terminal-body { padding: 14px; font-size: 0.75rem; }
+  .stat-num { font-size: 1.6rem; }
+}
+@media (max-width: 480px) {
+  .metrics-grid { grid-template-columns: 1fr; }
+  .hero-stats { flex-direction: column; gap: 16px; }
+  .stat-item { text-align: left; display: flex; gap: 12px; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Scroll Progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Matrix Canvas -->
+<canvas id="matrixCanvas"></canvas>
+<div class="scanlines"></div>
+<div class="grid-overlay"></div>
+
+<!-- Navigation -->
+<nav id="mainNav">
+  <a href="../../portfolio/index.html" class="nav-logo" style="text-decoration:none;">ZWX</a>
+  <ul class="nav-links">
+    <li><a href="#project">项目概览</a></li>
+    <li><a href="#features">核心能力</a></li>
+    <li><a href="#dev">开发历程</a></li>
+    <li><a href="#tech">技术栈</a></li>
+    <li><a href="#results">成果</a></li>
+  </ul>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      北京中安发信息技术研究院 · 2026 暑期实习
+    </div>
+    <h1>
+      日志溯源<br>
+      <span class="highlight-green">卫士</span><span class="highlight-blue">智能体</span>
+    </h1>
+
+    <div class="terminal-hero">
+      <div class="terminal-titlebar">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">log-trace-guard-agent — bash</span>
+      </div>
+      <div class="terminal-body" id="terminalBody">
+        <div class="terminal-line" style="animation-delay:0.1s">
+          <span class="prompt">$ </span><span class="cmd">cd log_trace_guard_agent && ls modules/</span>
+        </div>
+        <div class="terminal-line" style="animation-delay:0.4s">
+          <span class="output">log_parse/  log_collect/  script_gen/  compliance/  log_correlate/  training/</span>
+        </div>
+        <div class="terminal-line" style="animation-delay:0.7s">
+          <span class="prompt">$ </span><span class="cmd">cat README.md | head -n 1</span>
+        </div>
+        <div class="terminal-line" style="animation-delay:1.0s">
+          <span class="output"># 日志溯源卫士智能体 — 安全日志分析与溯源平台</span>
+        </div>
+        <div class="terminal-line" style="animation-delay:1.3s">
+          <span class="prompt">$ </span><span class="cmd">python3 -c "</span><span class="cmd highlight">from modules import *</span><span class="cmd">; print(f'已注册 {len(StrategyFactory.get_all_types())} 种策略')"</span>
+        </div>
+        <div class="terminal-line" style="animation-delay:1.7s">
+          <span class="success">>>> 已注册 16 种攻击链检测策略 · 6 个功能模块 · 22 个前端页面</span>
+        </div>
+        <div class="terminal-line" style="animation-delay:2.0s">
+          <span class="prompt">$ </span><span class="cmd">./run.sh --mode production</span>
+        </div>
+        <div class="terminal-line" style="animation-delay:2.3s">
+          <span class="success">✓ 服务启动成功 → http://localhost:8000</span>
+        </div>
+        <div class="terminal-line" style="animation-delay:2.5s">
+          <span class="prompt">$ </span>
+          <span class="terminal-cursor"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num"><span class="counter" data-target="6">0</span></span>
+        <span class="stat-label">核心模块</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num"><span class="counter" data-target="22">0</span></span>
+        <span class="stat-label">功能页面</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num"><span class="counter" data-target="16">0</span></span>
+        <span class="stat-label">攻击链规则</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num"><span class="counter" data-target="26">0</span></span>
+        <span class="stat-label">API 接口</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Project Overview -->
+<section class="section" id="project">
+  <div class="section-header fade-in-up">
+    <div class="section-tag">Overview</div>
+    <h2 class="section-title">项目 <span class="accent">概览</span></h2>
+    <p class="section-desc">基于 FastAPI + Vue3 的安全日志智能分析平台，覆盖日志解析、攻击溯源、合规审计、实训演练全链路</p>
+  </div>
+
+  <!-- Architecture -->
+  <div class="arch-container fade-in-up">
+    <div class="arch-title">// 系统架构 — 六模块流水线</div>
+    <div class="arch-flow">
+      <div class="arch-node"><div class="arch-node-icon">📋</div><div class="arch-node-label">日志解析</div><div class="sub-label">6 种日志格式</div></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node"><div class="arch-node-icon">📡</div><div class="arch-node-label">日志采集</div><div class="sub-label">多源接入</div></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node"><div class="arch-node-icon">🔍</div><div class="arch-node-label">联合审查</div><div class="sub-label">关键词+LLM 混合</div></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node"><div class="arch-node-icon">🛡️</div><div class="arch-node-label">脚本生成</div><div class="sub-label">ES/Splunk/grep</div></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node"><div class="arch-node-icon">📊</div><div class="arch-node-label">合规审计</div><div class="sub-label">19 条规则</div></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node"><div class="arch-node-icon">🎯</div><div class="arch-node-label">攻防实训</div><div class="sub-label">12 个场景</div></div>
+    </div>
+
+    <div class="code-snippet" style="margin-top:40px">
+      <div class="code-header">// system/modules/__init__.py</div>
+      <pre>from core.ai_base.llm_factory <span class="kw">import</span> <span class="fn">LLMFactory</span>
+from modules.log_correlate <span class="kw">import</span> <span class="fn">AttackChainMatcher</span>   <span class="cmt"># 关键词引擎</span>
+from modules.log_correlate <span class="kw">import</span> <span class="fn">LLMChainAnalyzer</span>       <span class="cmt"># LLM 语义引擎</span>
+from modules.training <span class="kw">import</span> <span class="fn">TaskEngine</span>                <span class="cmt"># 实训引擎</span>
+from modules.script_gen <span class="kw">import</span> <span class="fn">ScriptGenService</span>          <span class="cmt"># 溯源脚本</span>
+
+<span class="cmt"># 两阶段分析引擎：关键词预过滤（毫秒级）→ LLM 语义降级（一次 API）</span>
+result = <span class="fn">hybrid_analyze</span>(log_lines, use_llm=<span class="kw">True</span>)
+<span class="cmt"># 返回：method="keyword" | "hybrid" | "llm"</span></pre>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Core Features -->
+<section class="section" id="features">
+  <div class="section-header fade-in-up">
+    <div class="section-tag">Capabilities</div>
+    <h2 class="section-title">核心 <span class="accent">能力</span></h2>
+    <p class="section-desc">从日志采集到攻击溯源，从合规审计到实战演练，全链路安全分析能力</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card fade-in-up">
+      <div class="feature-icon green">🔍</div>
+      <h3>日志关联分析</h3>
+      <p>关键词预过滤 + LLM 语义降级的两阶段引擎，毫秒级检出 16 种攻击链。支持日志文件上传、批量分析。</p>
+      <span class="feature-metric">16 种攻击链 · 关键词+LLM 混合</span>
+    </div>
+    <div class="feature-card fade-in-up">
+      <div class="feature-icon cyan">🛡️</div>
+      <h3>攻击溯源脚本</h3>
+      <p>自动生成 ES Query DSL、Splunk SPL、grep 正则三种溯源脚本，支持一键执行与结果回显。</p>
+      <span class="feature-metric">ES / Splunk / grep 三模式</span>
+    </div>
+    <div class="feature-card fade-in-up">
+      <div class="feature-icon blue">📊</div>
+      <h3>合规审计</h3>
+      <p>覆盖等保 2.0 的 19 条合规规则，自动检测日志留存完整性、敏感操作审计、权限合规。</p>
+      <span class="feature-metric">19 条规则 · 等保 2.0 覆盖</span>
+    </div>
+    <div class="feature-card fade-in-up">
+      <div class="feature-icon purple">🎯</div>
+      <h3>攻防实训场景</h3>
+      <p>12 个实战训练场景，支持从真实攻击链动态生成实训任务。答题完成后可查看实训报告。</p>
+      <span class="feature-metric">12 场景 · 动态生成</span>
+    </div>
+    <div class="feature-card fade-in-up">
+      <div class="feature-icon orange">🤖</div>
+      <h3>AI 智能对话</h3>
+      <p>集成 LLM 与 RAG 检索增强，支持自然语言问答、日志分析、策略建议，知识库覆盖攻击手法。</p>
+      <span class="feature-metric">RAG + ChromaDB 向量检索</span>
+    </div>
+    <div class="feature-card fade-in-up">
+      <div class="feature-icon red">⚙️</div>
+      <h3>CLI 命令行版本</h3>
+      <p>终端版智能体，保留核心分析能力：日志解析、脚本生成、关联分析、Splunk 执行，轻量无前端。</p>
+      <span class="feature-metric">6 大菜单 · 零依赖部署</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Development Journey -->
+<section class="section" id="dev">
+  <div class="section-header fade-in-up">
+    <div class="section-tag">Journey</div>
+    <h2 class="section-title">开发 <span class="accent">历程</span></h2>
+    <p class="section-desc">从零到一的完整项目建设过程</p>
+  </div>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <div class="tl-title">架构设计与基础设施搭建</div>
+          <div class="tl-date">第 1-2 周</div>
+        </div>
+        <div class="tl-desc">确定 FastAPI + Vue3 技术栈，设计模块化架构：策略工厂模式 + Pydantic 校验 + JSON 外部配置。搭建项目骨架，实现 LLM 工厂、上下文管理器、路由注册等基础设施。</div>
+        <div class="tl-highlights">
+          <div class="tl-highlight"><span class="hl-icon">▸</span>六模块流水线架构设计 — 数据流单向解耦</div>
+          <div class="tl-highlight"><span class="hl-icon">▸</span>工厂注册模式：<strong>StrategyFactory.register("name", Class)</strong> 零硬编码注册</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <div class="tl-title">核心模块开发（解析·采集·脚本·合规）</div>
+          <div class="tl-date">第 3-4 周</div>
+        </div>
+        <div class="tl-desc">并行开发日志解析（6 种格式）、日志采集（多源接入）、脚本生成（正则/ES/Splunk）、合规审计（19 条等保规则），每个模块独立可测。</div>
+        <div class="tl-highlights">
+          <div class="tl-highlight"><span class="hl-icon">▸</span>每条合规规则独立校验：等保要求的日志留存、敏感操作审计全覆盖</div>
+          <div class="tl-highlight"><span class="hl-icon">▸</span>脚本生成三模式一键切换，后端生成 → 前端格式化展示</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <div class="tl-title">两阶段分析引擎：关键词 + LLM 混合</div>
+          <div class="tl-date">第 5 周</div>
+        </div>
+        <div class="tl-desc">重写日志联合审查模块。16 条攻击链规则（SSH 爆破、SQL 注入、横向移动、数据窃取等），关键词预过滤毫秒级返回，LLM 语义降级兜底。避免为每条日志调 API，O(N) → O(1)。</div>
+        <div class="tl-highlights">
+          <div class="tl-highlight"><span class="hl-icon">▸</span>关键词命中 → 零 API 延迟返回（纯本地正则）</div>
+          <div class="tl-highlight"><span class="hl-icon">▸</span>关键词漏报 → 一次 LLM 调用分析全部日志</div>
+          <div class="tl-highlight"><span class="hl-icon">▸</span><strong>混合模式</strong>：关键词 + LLM 同时运行，结果按 chain_name 去重合并</div>
+        </div>
+
+        <div class="code-snippet">
+          <div class="code-header">// modules/log_correlate/service.py — 混合分析核心</div>
+          <pre>keyword_chains = matcher.match(lines)          <span class="cmt"># 毫秒级关键词</span>
+<span class="kw">if</span> keyword_chains <span class="kw">and not</span> use_llm:
+    <span class="kw">return</span> keyword_chains                        <span class="cmt"># 零 API 快路径</span>
+
+llm_result = <span class="kw">await</span> <span class="fn">LLMChainAnalyzer.analyze</span>(lines)  <span class="cmt"># 一次 LLM</span>
+<span class="kw">return</span> <span class="fn">merge_chain_results</span>(keyword_chains, llm_result)  <span class="cmt"># 去重+合并</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <div class="tl-title">攻防实训 + 跨模块闭环</div>
+          <div class="tl-date">第 6 周</div>
+        </div>
+        <div class="tl-desc">开发攻防实训模块：12 个预设场景 + 真实攻击链动态生成。实现跨模块数据回流——溯源结果可一键生成实训场景，实训报告可回看。</div>
+        <div class="tl-highlights">
+          <div class="tl-highlight"><span class="hl-icon">▸</span>溯源 → 实训场景：真实攻击链自动转化为训练任务</div>
+          <div class="tl-highlight"><span class="hl-icon">▸</span>时序推理引擎：时间戳提取 + 攻击阶段推断 + IP 因果关联</div>
+          <div class="tl-highlight"><span class="hl-icon">▸</span>置信度动态调整：base ± (序列有效性 + IP 连续性 + 时间合理性)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <div class="tl-title">前端 SPA + CLI 双端发布</div>
+          <div class="tl-date">第 7-8 周</div>
+        </div>
+        <div class="tl-desc">Vue3 + Element Plus SPA 开发，6 个导航模块、22 子页面全部完成。同步开发 CLI 命令行版本（精简核心功能）。全部 26 个 API 测试 + 11 个 pytest 单元测试通过。</div>
+        <div class="tl-highlights">
+          <div class="tl-highlight"><span class="hl-icon">▸</span>前端 Vue3 SPA，支持文件上传、多文件批量、实时分析结果渲染</div>
+          <div class="tl-highlight"><span class="hl-icon">▸</span>CLI 版保留 6 大菜单，ES/Splunk 查询支持一键执行</div>
+          <div class="tl-highlight"><span class="hl-icon">▸</span>全部 26 个 API 端点测试通过，11/11 pytest 通过</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Tech Stack -->
+<section class="section" id="tech">
+  <div class="section-header fade-in-up">
+    <div class="section-tag">Stack</div>
+    <h2 class="section-title">技术 <span class="accent">栈</span></h2>
+    <p class="section-desc">全栈技术实践，从后端架构到 AI 应用</p>
+  </div>
+
+  <div class="metrics-grid" style="margin-bottom:40px">
+    <div class="metric-card">
+      <div class="metric-icon">🐍</div>
+      <div class="metric-value">Python</div>
+      <div class="metric-label">后端语言</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">⚡</div>
+      <div class="metric-value">FastAPI</div>
+      <div class="metric-label">Web 框架</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">🖼️</div>
+      <div class="metric-value">Vue 3</div>
+      <div class="metric-label">前端 SPA</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">🤖</div>
+      <div class="metric-value">LLM</div>
+      <div class="metric-label">AI 集成</div>
+    </div>
+  </div>
+
+  <div class="tech-cloud fade-in-up">
+    <span class="tech-tag">FastAPI</span>
+    <span class="tech-tag">Python 3.10+</span>
+    <span class="tech-tag">Pydantic v2</span>
+    <span class="tech-tag">Vue 3 + Element Plus</span>
+    <span class="tech-tag">TypeScript</span>
+    <span class="tech-tag">SQLAlchemy</span>
+    <span class="tech-tag">ChromaDB</span>
+    <span class="tech-tag">Pytest</span>
+    <span class="tech-tag">Docker</span>
+    <span class="tech-tag">RESTful API</span>
+    <span class="tech-tag">工厂模式</span>
+    <span class="tech-tag">策略模式</span>
+    <span class="tech-tag">RAG 检索增强</span>
+    <span class="tech-tag">LLM 工具调用</span>
+    <span class="tech-tag">正则表达式</span>
+    <span class="tech-tag">Elasticsearch DSL</span>
+    <span class="tech-tag">Splunk SPL</span>
+    <span class="tech-tag">Git</span>
+    <span class="tech-tag">Linux / WSL</span>
+    <span class="tech-tag">ES 查询</span>
+    <span class="tech-tag">Shell 脚本</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Results -->
+<section class="section" id="results">
+  <div class="section-header fade-in-up">
+    <div class="section-tag">Results</div>
+    <h2 class="section-title">项目 <span class="accent">成果</span></h2>
+    <p class="section-desc">从架构设计到测试交付，完整项目的量化产出</p>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon">🧩</div>
+      <div class="metric-value"><span class="counter" data-target="6">0</span></div>
+      <div class="metric-label">独立功能模块</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">📄</div>
+      <div class="metric-value"><span class="counter" data-target="22">0</span></div>
+      <div class="metric-label">前端功能页面</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">🔌</div>
+      <div class="metric-value"><span class="counter" data-target="26">0</span></div>
+      <div class="metric-label">API 端点</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">🧪</div>
+      <div class="metric-value">11/11</div>
+      <div class="metric-label">Pytest 通过</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">🔫</div>
+      <div class="metric-value"><span class="counter" data-target="16">0</span></div>
+      <div class="metric-label">攻击链规则</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">📋</div>
+      <div class="metric-value"><span class="counter" data-target="19">0</span></div>
+      <div class="metric-label">合规审计规则</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">🎮</div>
+      <div class="metric-value"><span class="counter" data-target="12">0</span></div>
+      <div class="metric-label">实训场景</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">⚡</div>
+      <div class="metric-value">2 阶段</div>
+      <div class="metric-label">关键词+LLM 分析引擎</div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>© 2026 张雯炫 · 北京中安发信息技术研究院 暑期实习项目</p>
+  <p style="margin-top:4px;font-size:0.72rem"><a href="../../portfolio/index.html">← 返回作品集首页</a></p>
+</footer>
+
+<div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<script>
+// ===== Matrix Rain (optimized) =====
+(function() {
+  const canvas = document.getElementById('matrixCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, cols, drops;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    cols = Math.floor(W / 16);
+    drops = Array(cols).fill(1);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789<>/{}[]|&^%$#@!';
+
+  function draw() {
+    ctx.fillStyle = 'rgba(10,14,23,0.05)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#00ff88';
+    ctx.font = '14px monospace';
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillStyle = Math.random() > 0.98 ? '#00ff88' : 'rgba(0,255,136,0.35)';
+      ctx.fillText(text, i * 16, drops[i] * 16);
+      if (drops[i] * 16 > H && Math.random() > 0.975) { drops[i] = 0; }
+      drops[i]++;
+    }
+  }
+  setInterval(draw, 50);
+})();
+
+// ===== Counter Animation =====
+function animateCounters() {
+  document.querySelectorAll('.counter').forEach(counter => {
+    if (counter.dataset.animated) return;
+    const rect = counter.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      counter.dataset.animated = 'true';
+      const target = parseInt(counter.dataset.target);
+      const duration = 1500;
+      const start = performance.now();
+      function update(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        counter.textContent = Math.floor(target * (1 - Math.pow(1 - progress, 3)));
+        if (progress < 1) requestAnimationFrame(update);
+        else counter.textContent = target;
+      }
+      requestAnimationFrame(update);
+    }
+  });
+}
+
+// ===== Scroll Handlers =====
+function handleScroll() {
+  // Reveal animations
+  document.querySelectorAll('.fade-in-up, .tl-item, .arch-node, .metric-card').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.88) el.classList.add('visible');
+  });
+  animateCounters();
+
+  // Scroll progress
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('scrollProgress').style.width = (scrollTop / docHeight * 100) + '%';
+
+  // Back to top
+  const btn = document.getElementById('backTop');
+  btn.className = scrollTop > 500 ? 'back-top visible' : 'back-top';
+
+  // Nav
+  document.getElementById('mainNav').classList.toggle('scrolled', scrollTop > 50);
+
+  // Nav highlight
+  const navLinks = document.querySelectorAll('.nav-links a');
+  navLinks.forEach(a => {
+    const section = document.querySelector(a.getAttribute('href'));
+    if (section) {
+      a.style.color = (scrollTop >= section.offsetTop - 200) ? '#00ff88' : '#8892a8';
+    }
+  });
+}
+window.addEventListener('scroll', handleScroll);
+window.addEventListener('load', handleScroll);
+
+// ===== Terminal Line Animations =====
+// Staggered reveal for terminal lines is handled by CSS animation-delay
+
+// ===== Architecture nodes staggered reveal =====
+(function() {
+  const nodes = document.querySelectorAll('.arch-node');
+  nodes.forEach((node, i) => {
+    node.style.transitionDelay = (i * 0.08) + 's';
+  });
+})();
+</script>
+</body>
+</html>
